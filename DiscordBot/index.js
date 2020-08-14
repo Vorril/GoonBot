@@ -43,7 +43,10 @@ function savePlayers(){
   fs.writeFile('./playerData.json', JSON.stringify(playerList), function(err){});
 }
 
-
+function intervalFunc(){
+  //console.log("Tick");
+}
+setInterval(intervalFunc, 3000);
 
 client.on("ready", function() {
   console.log("Ready");
