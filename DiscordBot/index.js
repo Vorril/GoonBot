@@ -39,14 +39,16 @@ fs.readFile('./playerData.json', function(errLoad,data){//Doing it with the call
     //need to conver to player class;
   };
 });//readFile
-function savePlayers(){
-  fs.writeFile('./playerData.json', JSON.stringify(playerList), function(err){});
+function savePlayers(){//Write each player to individual file? would make saving easier
+  fs.writeFile('./playerData.json', JSON.stringify(playerList), function(err){});//TODO Fails if a member in the player class is a class(timeout from intervals causing but need to olve for inventory at some point)
 }
+
 
 function intervalFunc(){
   //console.log("Tick");
 }
-setInterval(intervalFunc, 3000);
+setInterval(intervalFunc, 60000);
+
 
 client.on("ready", function() {
   console.log("Ready");
@@ -54,7 +56,8 @@ client.on("ready", function() {
 
 
 client.on("message", message => {
-  //console.log(message.content);
+  if(message.author.tag == "GoonBot#3603") return;//someone tricked bot into saying !something
+
   if(message.content == (prefix+"gif")){
     //message.channel.send("Command seen");
     giphy.search('gifs', {"q":"random"})
@@ -68,7 +71,7 @@ client.on("message", message => {
   }
   else if(message.content.startsWith(prefix+"gif ")&& message.content.length>5){//'!gif ' = 5
     var searchTerm = message.content.substring(5);
-    console.log(searchTerm);
+    //console.log(searchTerm);
     giphy.search('gifs', {"q":searchTerm})
       .then((response) => {
         var totalResponses = response.data.length;
@@ -79,7 +82,7 @@ client.on("message", message => {
         var responseIndex = Math.floor((Math.random()*10+1))%totalResponses;
         var responseFinal = response.data[responseIndex];
 
-        message.channel.send(searchTerm+" gif", {files:[responseFinal.images.fixed_height.url]});
+        message.channel.send(`${totalResponses} ${searchTerm} gifs found`, {files:[responseFinal.images.fixed_height.url]});
 
       });//then
     }//else if
@@ -88,7 +91,7 @@ client.on("message", message => {
 else if(message.content.startsWith(prefix))
     switch (message.content.toLowerCase()) {
       case "!commands":
-        message.channel.send("GoonBot know do these: \n !gif <search> \n !snickers \n !stats \n");//!startQuest \n !stats");
+        message.channel.send("GoonBot know do these: \n !gif <search> \n !snickers \n !fish \n !stats \n");//!startQuest \n !stats");
       break;
 
       case "devcommands":
@@ -109,6 +112,15 @@ else if(message.content.startsWith(prefix))
         break;//snickers
       }
 
+      case "!fish":
+        var player = checkForPlayer(message.author.tag);
+        player.fish(message);
+
+      break;
+
+      case "!cleanup":
+        //clear useulss / old chat messages
+      break;
 
       //Testing funcitons:
       case "!time":

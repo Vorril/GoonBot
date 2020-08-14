@@ -9,10 +9,14 @@ class Player{
     characterClass = "Peasant";
     HP = 10;
     gold = 0;
+    fishCaught = 0;
     //todo inventory array object
 
+    currentAction = "None";//Might become innacurate if something is in progress and bot crashes
     lastActionTaken = "";
-    LastActionTime = 0;
+    lastActionTime = 0;//Was going to use this and check based on Date.now() but just doing intervals seems easier
+    activityTimeout = "";//hold timeout var from node interval function // should be private
+
 
     //test function
     eatSnickers(message){
@@ -42,11 +46,33 @@ class Player{
         message.channel.send(stringFeedback);
     };
 
+   
+
+    fish(message){//wanted to do this recursively but passing class functions is nonsense bc of .this scope I guess?
+        if(this.activityTimeout == ""){//check if busy multiple ways to track this
+            var self = this;
+            self.activityTimeout = setInterval(function(){self.fishLoop(message)}, 5000);
+            this.currentAction = "Fishing";
+         return;
+        }
+        else message.channel.send(`${message.author.username} is busy ${this.currentAction}`);//busy doing what could probably extract this to a function it will happen often
+    }
+    fishLoop(message){
+        if(Math.random() > 0.9){//Tie into fishing skill
+            //TODO type of fish and inventory
+            message.channel.send(`${message.author.username} catches a fish!`);
+            clearInterval(this.activityTimeout);
+            this.activityTimeout = "";
+            this.currentAction = "none";
+            this.fishCaught++;
+        }
+       // else console.log("Tick");
+    }
+
     setClass(){//sets random class from options
         var classIndex = Math.floor(Math.random()*classOptions.length);
         this.characterClass = classOptions[classIndex];
         
-        console.log(this.characterClass);
     }
 
     printStats(message){
@@ -54,6 +80,7 @@ class Player{
         statString = statString + "Class: " + this.characterClass + "\n";
         statString = statString + "HP: " + this.HP + "\n";
         statString = statString + "Gold: " + this.gold + "\n";
+        statString = statString + "Fish caught: " + this.fishCaught + "\n";
 
         if(this.HP <= 0) statString = statString + message.author.username + " is ded \n";
 
