@@ -49,15 +49,23 @@ class Player{
    
 
     fish(message){//wanted to do this recursively but passing class functions is nonsense bc of .this scope I guess?
+      
         if(this.activityTimeout == ""){//check if busy multiple ways to track this
+           
             var self = this;
             self.activityTimeout = setInterval(function(){self.fishLoop(message)}, 5000);
             this.currentAction = "Fishing";
          return;
+            
+            
+            //this.activityTimeout = setInterval( function()  {this.fishLoop(message)},3000);//is not a function or callback errors
+            //this.currentAction = "Fishing";
+
         }
         else message.channel.send(`${message.author.username} is busy ${this.currentAction}`);//busy doing what could probably extract this to a function it will happen often
     }
     fishLoop(message){
+   //    fishLoop = (message)=>{
         if(Math.random() > 0.9){//Tie into fishing skill
             //TODO type of fish and inventory
             message.channel.send(`${message.author.username} catches a fish!`);

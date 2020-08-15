@@ -72,7 +72,7 @@ client.on("message", message => {
   else if(message.content.startsWith(prefix+"gif ")&& message.content.length>5){//'!gif ' = 5
     var searchTerm = message.content.substring(5);
     //console.log(searchTerm);
-    giphy.search('gifs', {"q":searchTerm})
+    giphy.search('gifs', {"q":searchTerm})//TODO clear symbols from search query
       .then((response) => {
         var totalResponses = response.data.length;
         if(totalResponses==0){
