@@ -42,6 +42,7 @@ fs.readFile('./playerData.json', function(errLoad,data){//Doing it with the call
     loadList.forEach(element => {
       playerList.push(new Player(element));
       console.log(JSON.stringify(playerList[playerList.length-1]));//NOT stringifyig members added via assign to the prototype???!?!
+     
     });
     console.log("Loaded players:"+playerList.length);
 
@@ -142,7 +143,7 @@ else
       case "!fish":
         var player = checkForPlayer(message.author.tag);
         player.fish(message);
-
+        console.log(player.fishingMember);
       break;
 
       case "!cleanup":
