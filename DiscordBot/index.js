@@ -3,8 +3,12 @@
  * Includes
  */
 const Discord = require("discord.js");
+const ffmpeg = require('ffmpeg');
+const { OpusEncoder } = require('@discordjs/opus');
+  const encoder = new OpusEncoder(48000, 2);
 const {prefix, token, giphytoken} = require('./config.json');
 const client = new Discord.Client();
+  var isReady = true;
 
 const GphApiClient = require('giphy-js-sdk-core');
 giphy = GphApiClient(giphytoken);
@@ -41,7 +45,7 @@ fs.readFile('./playerData.json', function(errLoad,data){//Doing it with the call
     loadList = JSON.parse(data);//data = stringify array
     loadList.forEach(element => {
       playerList.push(new Player(element));
-      console.log(JSON.stringify(playerList[playerList.length-1]));//NOT stringifyig members added via assign to the prototype???!?!
+     // console.log(JSON.stringify(playerList[playerList.length-1]));//NOT stringifyig members added via assign to the prototype???!?!
      
     });
     console.log("Loaded players:"+playerList.length);
@@ -63,11 +67,29 @@ function loadExternals(){
   commandList = tempArray;
 }
 
+function playAudio(message, audioFile){
+  isReady = false;
+        var voiceChannel = message.member.voice.channel;
+        if(!voiceChannel){
+          isReady = true;
+          return; // Messager is not in a voice channel
+        }
 
+        voiceChannel.join().then(connection =>{
+          const dispatcher = connection.play(audioFile);
+          
+          dispatcher.on("finish", () => {voiceChannel.leave(); isReady = true});
+        }).catch(err => console.log(err));
+}
+
+function deleteMessage(message){
+  message.delete();
+}
 
 client.on("ready", function() {
   console.log("Ready");
 });
+
 
 
 client.on("message", message => {
@@ -109,6 +131,7 @@ client.on("message", message => {
     // giphy
 
 else
+    if(isReady)
     switch (commandRead) {
       case "!commandlist":
         var keyNames = "";
@@ -171,6 +194,37 @@ else
         var player = checkForPlayer(message.author.tag);
         player.setClass();
         savePlayers();
+      break;
+
+
+//audio
+      case "!beta":    
+        playAudio(message, './Audio/beta.mp3');
+        setTimeout(() => { message.delete(); }, 350);
+      break;    
+      case "!amazin":    
+        playAudio(message, './Audio/amazin.wav');
+        setTimeout(() => { message.delete(); }, 350);
+      break;
+      case "!brb":    
+       playAudio(message, './Audio/amazin.wav');
+       setTimeout(() => { message.delete(); }, 350);
+      break;
+      case "!interesting":    
+        playAudio(message, './Audio/interesting.mp3');
+        setTimeout(() => { message.delete(); }, 350);
+      break;
+      case "!mexicans":    
+        playAudio(message, './Audio/mexicans.mp3');
+        setTimeout(() => { message.delete(); }, 350);
+      break;
+      case "!ow":    
+        playAudio(message, './Audio/ow.mp3');
+        setTimeout(() => { message.delete(); }, 350);
+      break;
+      case "!surprise":    
+        playAudio(message, './Audio/surprise.mp3');
+        setTimeout(() => { message.delete(); }, 350);
       break;
 
       default:
