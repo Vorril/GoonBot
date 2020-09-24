@@ -8,12 +8,17 @@ const { OpusEncoder } = require('@discordjs/opus');
   const encoder = new OpusEncoder(48000, 2);
 const {prefix, token, giphytoken} = require('./config.json');
 const client = new Discord.Client();
-  var isReady = true;
 
 const GphApiClient = require('giphy-js-sdk-core');
 giphy = GphApiClient(giphytoken);
 
 const fs = require('fs');
+
+//Bot variables:
+var isReady = false;
+var currentChannel = "";
+var timeAllowed = -1;
+
 
 /**
  * Player related functions/stuff. Data structure / search / save/ load
@@ -67,6 +72,13 @@ function loadExternals(){
   commandList = tempArray;
 }
 
+
+
+
+
+/*
+*  static functions
+*/
 function playAudio(message, audioFile){
   isReady = false;
         var voiceChannel = message.member.voice.channel;
@@ -74,20 +86,44 @@ function playAudio(message, audioFile){
           isReady = true;
           return; // Messager is not in a voice channel
         }
+        
+        if(voiceChannel == currentChannel){//Bot is alrleady in the correct channel
+          connection =>{
+            const dispatcher = connection.play(audioFile);
 
-        voiceChannel.join().then(connection =>{
+            dispatcher.on("finish", () => { isReady = true});
+          }
+        }
+
+        voiceChannel.join().then(connection =>{//Bot needs to join first
           const dispatcher = connection.play(audioFile);
-          
-          dispatcher.on("finish", () => {voiceChannel.leave(); isReady = true});
+
+          dispatcher.on("finish", () => { isReady = true});
         }).catch(err => console.log(err));
+
+        //Setup leaving and cleanup:
+        currentChannel = voiceChannel;
+        timeAllowed = Date.now() + 300000;
+        //setTimeout(() => { message.delete(); }, 350);
 }
 
-function deleteMessage(message){
-  message.delete();
+function channelTimeout(){
+  if(Date.now() > timeAllowed && currentChannel != ""){
+    currentChannel.leave();
+    currentChannel = "";
+
+  }
 }
+
+
+/*
+* Client callbacks
+*/
 
 client.on("ready", function() {
   console.log("Ready");
+  isReady = true;
+  setInterval(channelTimeout, 300000);//Check every 5m
 });
 
 
@@ -207,7 +243,7 @@ else
         setTimeout(() => { message.delete(); }, 350);
       break;
       case "!brb":    
-       playAudio(message, './Audio/amazin.wav');
+       playAudio(message, './Audio/brb.mp3');
        setTimeout(() => { message.delete(); }, 350);
       break;
       case "!interesting":    
@@ -232,7 +268,7 @@ else
       break;
     }
 
-    commandList.forEach(element => {
+    commandList.forEach(element => {//check dynamically loaded commands
       var keyName = Object.keys(element); // Based on how commandlist is intended to be used should only be one key one func
       if((prefix+keyName)==commandRead){
 
