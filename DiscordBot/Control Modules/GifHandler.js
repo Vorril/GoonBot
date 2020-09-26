@@ -1,7 +1,7 @@
 const { giphytoken } = require("../config.json");
 
 const GphApiClient = require("giphy-js-sdk-core");
-giphy = GphApiClient(giphytoken);
+let giphy = GphApiClient(giphytoken);
 
 const handleGifsRandom = () => {
   //message.channel.send("Command seen");
