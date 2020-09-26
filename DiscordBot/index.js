@@ -18,7 +18,8 @@ const fs = require('fs');
 var isReady = false;
 var currentChannel = "";
 var timeAllowed = -1;
-
+var rpsQueue = "";
+var rpsChoice;
 
 /**
  * Player related functions/stuff. Data structure / search / save/ load
@@ -79,15 +80,15 @@ function loadExternals(){
 /*
 *  static functions
 */
-function playAudio(message, audioFile){
+function playAudio(voiceChannel, audioFile){
+  //console.log(voiceChannel.id);
   isReady = false;
-        var voiceChannel = message.member.voice.channel;
         if(!voiceChannel){
           isReady = true;
           return; // Messager is not in a voice channel
         }
         
-        if(voiceChannel == currentChannel){//Bot is alrleady in the correct channel
+        if(voiceChannel.id == currentChannel.id){//Bot is alrleady in the correct channel
           connection =>{
             const dispatcher = connection.play(audioFile);
 
@@ -103,11 +104,11 @@ function playAudio(message, audioFile){
 
         //Setup leaving and cleanup:
         currentChannel = voiceChannel;
-        timeAllowed = Date.now() + 300000;
+        timeAllowed = Date.now() + 3600000;
         //setTimeout(() => { message.delete(); }, 350);
 }
 
-function channelTimeout(){
+function channelTimeout(){//Called on interval
   if(Date.now() > timeAllowed && currentChannel != ""){
     currentChannel.leave();
     currentChannel = "";
@@ -123,10 +124,23 @@ function channelTimeout(){
 client.on("ready", function() {
   console.log("Ready");
   isReady = true;
-  setInterval(channelTimeout, 300000);//Check every 5m
+  setInterval(channelTimeout, 60000);//Check every 1m
 });
 
+//Called on channel change, mute, or deafen, but I think not on user name changes 
+client.on("voiceStateUpdate", (oldUserState, newUserState) => {
+ if( newUserState.id == 742609957148557374) return;//ignore the bot itself
+  //console.log(oldUserState.channelID);
+  //console.log(newUserState);
 
+  //The user event was a channel change and the new channel is the same the bot is currently in
+  if((oldUserState.channelID != newUserState.channelID) && newUserState.channelID == currentChannel.id){
+    if(isReady)
+      setTimeout(() => { playAudio(currentChannel, './Audio/beta.mp3'); }, 350);
+  }
+
+
+})
 
 client.on("message", message => {
   if(!message.content.startsWith(prefix)) return;//not a command
@@ -166,6 +180,93 @@ client.on("message", message => {
     }//else if
     // giphy
 
+  else if(commandRead == "!roll"){
+    function roll(range){
+      return Math.floor(Math.random()*range)+1;
+    }
+    if(commandModifier == ""){
+      var rolled = roll(100);
+      message.channel.send(`${message.author} rolled: \n ${rolled} (1-100)`);
+      return;
+    }
+    commandModifier = commandModifier.trimEnd();
+    var dice = commandModifier.split(" ", 20);
+
+    var rollOutput = `${message.author} rolled: \n`;
+    dice.forEach(element => {
+      diceSize = parseInt(element, 10);
+      if(!isNaN(diceSize) && diceSize > 0){
+        rolled = roll(roll(diceSize));
+        rollOutput += `${rolled} (1-${diceSize})\n`;
+      }
+    });
+      message.channel.send(rollOutput);
+      return;
+  }
+else if(commandRead == "!rps"){
+  //Invalid selecetion:
+  if(!(commandModifier == "rock" || commandModifier == "r" ||
+  commandModifier == "paper" || commandModifier == "p" ||
+  commandModifier == "scizzor" || commandModifier == "s" )){
+    message.delete();
+    message.channel.send("Invalid choice: rock/paper/scizzor/r/p/s");
+    return;
+  }
+  //First player queues up:
+  else if(rpsQueue == ""){//should probably be a per channel function?
+    rpsQueue = message.author;
+    message.channel.send(`RPS \n${rpsQueue} wants to play rock paper scizzors! Type !rps <rock/paper/scizzor/r/p/s>`);
+    message.delete();
+
+    rpsChoice = commandModifier;
+    //Simplify for logic comparison later:
+    if(rpsChoice == "rock") rpsChoice = "r";
+    if(rpsChoice == "paper") rpsChoice = "p";
+    if(rpsChoice == "scizzor") rpsChoice = "s";
+    return;
+  }
+  //Else player 2 also w/ a valid input:
+  else{
+
+    var choice2 = commandModifier;
+    if(choice2 == "rock") choice2 = "r";
+    if(choice2 == "paper") choice2 = "p";
+    if(choice2 == "scizzor") choice2 = "s";
+
+    var outputStr = `RPS \n${rpsQueue}: ${rpsChoice} \n${message.author}: ${choice2}\n`;
+
+    if(rpsChoice == choice2){
+      message.channel.send(outputStr + `${rpsQueue} and ${message.author} tied`)
+
+      message.delete();
+      rpsQueue = "";
+      rpsChoice = "";
+      return;  
+    }
+
+    var p1Wins = true;//assume p1 wins and only check fail cases 
+    //Jas you should do this with Ternary operator for shits
+    if(rpsChoice == "r" && choice2 == "p"){
+      p1Wins = false;
+    }
+    else if(rpsChoice == "p" && choice2 == "s"){
+      p1Wins = false;
+    }
+    else if(rpsChoice == "s" && choice2 == "r"){
+      p1Wins = false;
+    }
+
+    if(p1Wins) outputStr += `${rpsQueue} beats ${message.author}!`
+    else outputStr += `${message.author} beats ${rpsQueue}!`
+    message.channel.send(outputStr);
+
+    message.delete();
+    rpsQueue = "";
+    rpsChoice = "";
+    return;  
+  }
+
+}
 else
     if(isReady)
     switch (commandRead) {
@@ -235,31 +336,31 @@ else
 
 //audio
       case "!beta":    
-        playAudio(message, './Audio/beta.mp3');
+        playAudio(message.member.voice.channel, './Audio/beta.mp3');
         setTimeout(() => { message.delete(); }, 350);
       break;    
       case "!amazin":    
-        playAudio(message, './Audio/amazin.wav');
+        playAudio(message.member.voice.channel, './Audio/amazin.wav');
         setTimeout(() => { message.delete(); }, 350);
       break;
       case "!brb":    
-       playAudio(message, './Audio/brb.mp3');
+       playAudio(message.member.voice.channel, './Audio/brb.mp3');
        setTimeout(() => { message.delete(); }, 350);
       break;
       case "!interesting":    
-        playAudio(message, './Audio/interesting.mp3');
+        playAudio(message.member.voice.channel, './Audio/interesting.mp3');
         setTimeout(() => { message.delete(); }, 350);
       break;
       case "!mexicans":    
-        playAudio(message, './Audio/mexicans.mp3');
+        playAudio(message.member.voice.channel, './Audio/mexicans.mp3');
         setTimeout(() => { message.delete(); }, 350);
       break;
       case "!ow":    
-        playAudio(message, './Audio/ow.mp3');
+        playAudio(message.member.voice.channel, './Audio/ow.mp3');
         setTimeout(() => { message.delete(); }, 350);
       break;
       case "!surprise":    
-        playAudio(message, './Audio/surprise.mp3');
+        playAudio(message.member.voice.channel, './Audio/surprise.mp3');
         setTimeout(() => { message.delete(); }, 350);
       break;
 
