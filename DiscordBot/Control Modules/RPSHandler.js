@@ -35,9 +35,17 @@ const handleRPS = (commandModifier, message) => {
 
     if (rpsChoice == choice2) {
       const wordChoice1 =
-        rpsChoice === "r" ? "rock" : rpsChoice === "p" ? "paper" : "scissor";
+        rpsChoice === "r"
+          ? ":rock:"
+          : rpsChoice === "p"
+          ? ":page_facing_up:"
+          : ":scissors:";
       const wordChoice2 =
-        choice2 === "r" ? "rock" : choice2 === "p" ? "paper" : "scissor";
+        choice2 === "r"
+          ? ":rock:"
+          : choice2 === "p"
+          ? ":page_facing_up:"
+          : ":scissors:";
 
       message.channel.send(
         outputStr +
@@ -62,9 +70,17 @@ const handleRPS = (commandModifier, message) => {
     }
 
     const wordChoice1 =
-      rpsChoice === "r" ? "rock" : rpsChoice === "p" ? "paper" : "scissor";
+      rpsChoice === "r"
+        ? ":rock:"
+        : rpsChoice === "p"
+        ? ":page_facing_up:"
+        : ":scissors:";
     const wordChoice2 =
-      choice2 === "r" ? "rock" : choice2 === "p" ? "paper" : "scissor";
+      choice2 === "r"
+        ? ":rock:"
+        : choice2 === "p"
+        ? ":page_facing_up:"
+        : ":scissors:";
 
     if (p1Wins)
       outputStr += `${rpsQueue} (${wordChoice1}) beats ${message.author} (${wordChoice2})!`;
