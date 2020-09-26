@@ -104,6 +104,7 @@ const handleRPGCommands = (commandRead, message) => {
       break;
 
     default:
+      return "unfound";
       break;
   }
 

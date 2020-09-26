@@ -3,23 +3,20 @@ const { giphytoken } = require("../config.json");
 const GphApiClient = require("giphy-js-sdk-core");
 let giphy = GphApiClient(giphytoken);
 
-const handleGifsRandom = () => {
+const handleGifsRandom = (message) => {
   //message.channel.send("Command seen");
   giphy.search("gifs", { q: "random" }).then((response) => {
     var totalResponses = response.data.length;
     var responseIndex = Math.floor(Math.random() * 10 + 1) % totalResponses;
     var responseFinal = response.data[responseIndex];
 
-    return [
-      "Random gif",
-      {
-        files: [responseFinal.images.fixed_height.url],
-      },
-    ];
+    message.channel.send("Random gif", {
+      files: [responseFinal.images.fixed_height.url],
+    });
   });
 };
 
-const handleGifsWithQuery = (commandModifier) => {
+const handleGifsWithQuery = (commandModifier, message) => {
   giphy
     .search("gifs", { q: commandModifier }) //TODO clear symbols from search query
     .then((response) => {
@@ -31,10 +28,9 @@ const handleGifsWithQuery = (commandModifier) => {
       var responseIndex = Math.floor(Math.random() * 10 + 1) % totalResponses;
       var responseFinal = response.data[responseIndex];
 
-      return [
-        `${totalResponses} ${commandModifier} gifs found`,
-        { files: [responseFinal.images.fixed_height.url] },
-      ];
+      message.channel.send(`${totalResponses} ${commandModifier} gifs found`, {
+        files: [responseFinal.images.fixed_height.url],
+      });
     });
 };
 

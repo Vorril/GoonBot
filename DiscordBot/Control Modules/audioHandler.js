@@ -45,6 +45,7 @@ const handleAudioCommands = (commandRead, message, playAudio) => {
       break;
 
     default:
+      return "unfound";
       break;
   }
 };

@@ -1,4 +1,7 @@
-const handleRPS = (commandModifier, message, rpsQueue, rpsChoice) => {
+let rpsQueue = "";
+let rpsChoice;
+
+const handleRPS = (commandModifier, message) => {
   const validCommands = ["rock", "r", "paper", "p", "scizzor", "s"];
   if (!validCommands.includes(commandModifier)) {
     message.delete();
@@ -10,7 +13,7 @@ const handleRPS = (commandModifier, message, rpsQueue, rpsChoice) => {
     //should probably be a per channel function?
     rpsQueue = message.author;
     message.channel.send(
-      `RPS \n${rpsQueue} wants to play rock paper scizzors! Type !rps <rock/paper/scizzor/r/p/s>`
+      `${rpsQueue} wants to play rock paper scizzors! Type !rps <rock/paper/scizzor/r/p/s>`
     );
     message.delete();
 
@@ -28,11 +31,17 @@ const handleRPS = (commandModifier, message, rpsQueue, rpsChoice) => {
     if (choice2 == "paper") choice2 = "p";
     if (choice2 == "scizzor") choice2 = "s";
 
-    let outputStr = `RPS \n${rpsQueue}: ${rpsChoice} \n${message.author}: ${choice2}\n`;
+    let outputStr = `Rock Paper Scissor Results:\n`;
 
     if (rpsChoice == choice2) {
+      const wordChoice1 =
+        rpsChoice === "r" ? "rock" : rpsChoice === "p" ? "paper" : "scissor";
+      const wordChoice2 =
+        choice2 === "r" ? "rock" : choice2 === "p" ? "paper" : "scissor";
+
       message.channel.send(
-        outputStr + `${rpsQueue} and ${message.author} tied`
+        outputStr +
+          `${rpsQueue} (${wordChoice1}) and ${message.author} (${wordChoice2}) tied`
       );
 
       message.delete();
@@ -52,8 +61,15 @@ const handleRPS = (commandModifier, message, rpsQueue, rpsChoice) => {
       p1Wins = false;
     }
 
-    if (p1Wins) outputStr += `${rpsQueue} beats ${message.author}!`;
-    else outputStr += `${message.author} beats ${rpsQueue}!`;
+    const wordChoice1 =
+      rpsChoice === "r" ? "rock" : rpsChoice === "p" ? "paper" : "scissor";
+    const wordChoice2 =
+      choice2 === "r" ? "rock" : choice2 === "p" ? "paper" : "scissor";
+
+    if (p1Wins)
+      outputStr += `${rpsQueue} (${wordChoice1}) beats ${message.author} (${wordChoice2})!`;
+    else
+      outputStr += `${message.author} (${wordChoice2}) beats ${rpsQueue} (${wordChoice1})!`;
     message.channel.send(outputStr);
 
     message.delete();

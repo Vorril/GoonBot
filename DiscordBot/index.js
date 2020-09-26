@@ -36,8 +36,6 @@ const { handleAudioCommands } = require("./Control Modules/audioHandler.js");
 var isReady = false;
 var currentChannel = "";
 var timeAllowed = -1;
-var rpsQueue = "";
-var rpsChoice;
 
 /*
  *  static functions
@@ -145,52 +143,58 @@ client.on("message", (message) => {
     /**
      * If search query IS NOT provided, generate a random gif
      */
-    const randomGif = handleGifsRandom();
-    message.channel.send(...randomGif);
+    const randomGif = handleGifsRandom(message);
   } else if (commandRead == "!gif") {
     /**
      * If search query IS provided, generate the appropriate gif
      */
-    const queriedGif = handleGifsWithQuery(commandModifier);
-    message.channel.send(...queriedGif);
+    const queriedGif = handleGifsWithQuery(commandModifier, message);
   } else if (commandRead == "!roll") {
     /***************************************
      ********     HANDLE ROLLS     *********
      ***************************************/
 
-    const rollOutput = handleDiceRoll(commandModifier, message.author);
+    const rollOutput = handleDiceRoll(commandModifier, message.author, message);
     message.channel.send(rollOutput);
     return;
   } else if (commandRead == "!rps") {
     /***************************************
      *****  HANDLE ROCK PAPER SCISSOR  *****
      ***************************************/
-    handleRPS(commandModifier, message, rpsQueue, rpsChoice);
+    handleRPS(commandModifier, message);
   } else if (isReady) {
-    const validCommands = [];
     /***************************************
      *****       HANDLE HELPERS        *****
      ***************************************/
-
-    handleHelperCommands(commandRead, message);
+    let helperRes = handleHelperCommands(commandRead, message);
 
     /***************************************
      *****       HANDLE RPG GAME       *****
      ***************************************/
-    handleRPGCommands(commandRead, message);
+    let rpgRes = handleRPGCommands(commandRead, message);
 
     /***************************************
      *****    HANDLE MISC COMMANDS     *****
      ***************************************/
-    handleMiscCommands(commandRead, message, process);
+    let miscRes = handleMiscCommands(commandRead, message, process);
 
     /***************************************
      *****   HANDLE AUDIO COMMANDS     *****
      ***************************************/
-    handleAudioCommands(commandRead, message, playAudio);
-  }
+    let audioRes = handleAudioCommands(commandRead, message, playAudio);
 
-  message.channel.send("GoonBot don't know that one try !commands. Ijjit.");
+    const resArr = [helperRes, rpgRes, miscRes, audioRes];
+
+    let allAreInvalid = true;
+    resArr.forEach((res) => {
+      if (typeof res === "undefined") {
+        allAreInvalid = false;
+      }
+    });
+    if (allAreInvalid) {
+      message.channel.send("GoonBot don't know that one try !commands. Ijjit.");
+    }
+  }
 }); //on message
 
 client.login(token);

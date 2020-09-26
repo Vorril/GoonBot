@@ -22,6 +22,7 @@ const handleMiscCommands = (commandRead, message, process) => {
       break;
 
     default:
+      return "unfound";
       break;
   }
 };
