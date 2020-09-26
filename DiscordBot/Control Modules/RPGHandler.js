@@ -103,6 +103,14 @@ const handleRPGCommands = (commandRead, message) => {
       savePlayers(playerList);
       break;
 
+    case "!commandlist":
+      var keyNames = "";
+      commandList.forEach((element) => {
+        keyNames += Object.keys(element) + "\n";
+      });
+      console.log("Commands found in commandList:" + "\n" + keyNames);
+      break;
+
     default:
       return "unfound";
       break;
