@@ -4,6 +4,7 @@
 const Player = require("../player");
 const fs = require("fs");
 const { prefix } = require("../config.json");
+const testVar;
 
 let commandList = new Array(); //Holds objects which should be single functions named by their !command
 
