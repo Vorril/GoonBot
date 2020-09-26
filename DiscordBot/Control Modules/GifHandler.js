@@ -37,4 +37,5 @@ const handleGifsWithQuery = (commandModifier) => {
       ];
     });
 };
-export { handleGifsRandom, handleGifsWithQuery };
+
+module.exports = { handleGifsRandom, handleGifsWithQuery };

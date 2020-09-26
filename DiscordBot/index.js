@@ -28,7 +28,9 @@ const {
   handleMiscCommands,
 } = require("./Control Modules/miscCommandsHandler.js");
 
-const fs = require("fs");
+const { handleRPGCommands } = require("./Control Modules/RPGHandler.js");
+
+const { handleAudioCommands } = require("./Control Modules/audioHandler.js");
 
 //Bot variables:
 var isReady = false;
@@ -36,37 +38,6 @@ var currentChannel = "";
 var timeAllowed = -1;
 var rpsQueue = "";
 var rpsChoice;
-
-loadExternals();
-
-// Player Variables
-let playerList = [];
-
-//load players from file during startup
-fs.readFile("./playerData.json", function (errLoad, data) {
-  //Doing it with the callback waits to ensure file loaded
-  if (errLoad) {
-  } else {
-    loadList = JSON.parse(data); //data = stringify array
-    loadList.forEach((element) => {
-      playerList.push(new Player(element));
-      // console.log(JSON.stringify(playerList[playerList.length-1]));//NOT stringifyig members added via assign to the prototype???!?!
-    });
-    console.log("Loaded players:" + playerList.length);
-
-    //loadExternals();
-    //need to conver to player class;
-  }
-}); //readFile
-
-function loadExternals() {
-  //These 5 lines couldfurther be modularized they shold be the same for every import
-  const Fishing = require("./Extensions/fishing.js");
-  var protoFishing = Fishing.importProperties(); // imports all player related properties
-  Object.assign(Player.prototype, protoFishing);
-  var tempArray = commandList.concat(Fishing.importCommands()); // imports commands which likely call the added functions above
-  commandList = tempArray;
-}
 
 /*
  *  static functions
@@ -196,6 +167,7 @@ client.on("message", (message) => {
      ***************************************/
     handleRPS(commandModifier, message, rpsQueue, rpsChoice);
   } else if (isReady) {
+    const validCommands = [];
     /***************************************
      *****       HANDLE HELPERS        *****
      ***************************************/
@@ -205,7 +177,7 @@ client.on("message", (message) => {
     /***************************************
      *****       HANDLE RPG GAME       *****
      ***************************************/
-    handleRPGCommands(commandRead, message, playerList);
+    handleRPGCommands(commandRead, message);
 
     /***************************************
      *****    HANDLE MISC COMMANDS     *****
@@ -218,14 +190,7 @@ client.on("message", (message) => {
     handleAudioCommands(commandRead, message, playAudio);
   }
 
-  commandList.forEach((element) => {
-    //check dynamically loaded commands
-    var keyName = Object.keys(element); // Based on how commandlist is intended to be used should only be one key one func
-    if (prefix + keyName == commandRead) {
-      var player = checkForPlayer(message.author.tag);
-      element[keyName](player, message); //way to do player.() ?
-    }
-  });
+  message.channel.send("GoonBot don't know that one try !commands. Ijjit.");
 }); //on message
 
 client.login(token);

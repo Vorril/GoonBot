@@ -21,9 +21,8 @@ const handleHelperCommands = (commandRead, message) => {
       break;
 
     default:
-      message.channel.send("GoonBot don't know that one try !commands. Ijjit.");
       break;
   }
 };
 
-export { handleHelperCommands };
+module.exports = { handleHelperCommands };

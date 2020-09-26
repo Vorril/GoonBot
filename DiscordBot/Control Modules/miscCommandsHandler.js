@@ -22,9 +22,8 @@ const handleMiscCommands = (commandRead, message, process) => {
       break;
 
     default:
-      message.channel.send("GoonBot don't know that one try !commands. Ijjit.");
       break;
   }
 };
 
-export { handleMiscCommands };
+module.exports = { handleMiscCommands };

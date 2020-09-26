@@ -20,4 +20,4 @@ const handleDiceRoll = (command, author) => {
   return rollOutput;
 };
 
-export { handleDiceRoll };
+module.exports = { handleDiceRoll };

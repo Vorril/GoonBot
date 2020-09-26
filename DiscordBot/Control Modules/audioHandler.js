@@ -45,9 +45,8 @@ const handleAudioCommands = (commandRead, message, playAudio) => {
       break;
 
     default:
-      message.channel.send("GoonBot don't know that one try !commands. Ijjit.");
       break;
   }
 };
 
-export { handleAudioCommands };
+module.exports = { handleAudioCommands };

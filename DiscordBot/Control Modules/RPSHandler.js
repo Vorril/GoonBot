@@ -63,4 +63,4 @@ const handleRPS = (commandModifier, message, rpsQueue, rpsChoice) => {
   }
 };
 
-export { handleRPS };
+module.exports = { handleRPS };
