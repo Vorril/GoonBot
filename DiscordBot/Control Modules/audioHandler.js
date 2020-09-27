@@ -44,6 +44,13 @@ const handleAudioCommands = (commandRead, message, playAudio) => {
       }, 350);
       break;
 
+    case "!slutmaker":
+      playAudio(message.member.voice.channel, "./Audio/slutmaker.mp3");
+      setTimeout(() => {
+        message.delete();
+      }, 350);
+      break;
+
     default:
       return "unfound";
       break;
