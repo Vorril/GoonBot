@@ -4,14 +4,12 @@
 const Player = require("../player");
 const fs = require("fs");
 const { prefix } = require("../config.json");
-const testVar;
-
-let commandList = new Array(); //Holds objects which should be single functions named by their !command
 
 // Player Variables
 let playerList = [];
 
 //load players from file during startup
+//ToDo implement restarting of long actions based on actionProgress
 fs.readFile("./playerData.json", function (errLoad, data) {
   //Doing it with the callback waits to ensure file loaded
   if (errLoad) {
@@ -28,22 +26,20 @@ fs.readFile("./playerData.json", function (errLoad, data) {
   }
 }); //readFile
 
-loadExternals();
+function savePlayers(playerList) {
+  playerList.forEach(element => {
+    if(element.activityTimeout != ""){
+      clearInterval(element.activityTimeout);
+      element.activityTimeout = ""; //TODO implement saving for longer actions
+      element.actionProgress = Date.now() - element.lastActionTime;
+    }
+    element.currentAction = "None";
+  });
 
-commandList.push({
-  hello: function () {
-    console.log("I was declared in index");
-  },
-});
-//commandList[0]["hello"]();
-
-function loadExternals() {
-  //These 5 lines could further be modularized they should be the same for every import
-  const Fishing = require("../Extensions/fishing.js");
-  var protoFishing = Fishing.importProperties(); // imports all player related properties
-  Object.assign(Player.prototype, protoFishing);
-  var tempArray = commandList.concat(Fishing.importCommands()); // imports commands which likely call the added functions above
-  commandList = tempArray;
+  //Write each player to individual file? would make saving easier
+  fs.writeFile("./playerData.json", JSON.stringify(playerList), function (
+    err
+  ) {}); //TODO Fails if a member in the player class is a class(timeout from intervals causing but need to olve for inventory at some point)
 }
 
 const checkForPlayer = (checkTag, playerList) => {
@@ -60,12 +56,6 @@ const checkForPlayer = (checkTag, playerList) => {
   return playerList[playerList.length - 1];
 };
 
-function savePlayers(playerList) {
-  //Write each player to individual file? would make saving easier
-  fs.writeFile("./playerData.json", JSON.stringify(playerList), function (
-    err
-  ) {}); //TODO Fails if a member in the player class is a class(timeout from intervals causing but need to olve for inventory at some point)
-}
 
 const handleRPGCommands = (commandRead, message) => {
   let player;
@@ -104,27 +94,12 @@ const handleRPGCommands = (commandRead, message) => {
       savePlayers(playerList);
       break;
 
-    case "!commandlist":
-      var keyNames = "";
-      commandList.forEach((element) => {
-        keyNames += Object.keys(element) + "\n";
-      });
-      console.log("Commands found in commandList:" + "\n" + keyNames);
-      break;
 
     default:
       return "unfound";
       break;
   }
 
-  commandList.forEach((element) => {
-    //check dynamically loaded commands
-    var keyName = Object.keys(element); // Based on how commandlist is intended to be used should only be one key one func
-    if (prefix + keyName == commandRead) {
-      var player = checkForPlayer(message.author.tag);
-      element[keyName](player, message); //way to do player.() ?
-    }
-  });
 };
 
 module.exports = { handleRPGCommands };
