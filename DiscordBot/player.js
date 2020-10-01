@@ -1,4 +1,4 @@
-
+const Map = require("./Control Modules/MapHandler.js");
 
 class Player{
     
@@ -11,6 +11,8 @@ class Player{
     characterClass = "Peasant";
     gold = 0;
     combatLvl = 1; combatXP = 0; HP = 10;
+    weapon = {};
+    armor = {};
     fishingLvl = 1; fishingXP = 0; fishCaught = 0;
     //todo inventory array object
 
@@ -19,7 +21,40 @@ class Player{
     activityTimeout = "";//hold timeout var from node interval function // should be private
     lastActionTime = 0;// Time action begins
     actionProgress = -1;//For saving Date.now() - lastActionTaken;
+    needsSaved = false;
 
+
+    checkActivity(message){
+      let activity = this.currentAction;
+      if (activity == "None" ){
+        message.channel.send(`${message.author} is not busy with anything.`);
+        return;
+      }
+      
+     // console.log(`${message.author} checks time ${Date.now()} Past time: ${this.lastActionTime}`);
+
+      let time_ms = Date.now() - this.lastActionTime;
+      let time_s = Math.floor(time_ms/1000);
+      let time_m = 0;
+      let time_hr = 0;
+
+      if(time_s >= 60) {
+        time_m = Math.floor(time_s/60);
+        time_s = time_s % 60;
+      }
+
+      if(time_m >= 60) {
+        time_hr = Math.floor(time_m/60);
+        time_m = time_m % 60;
+      }
+
+      let totalTime = "";
+      if(time_hr > 0) totalTime += `${time_hr}hr `;
+      if(time_m > 0) totalTime += `${time_m}m `;
+      totalTime += `${time_s}s`;
+
+      message.channel.send(`${message.author} has been ${this.currentAction} for ${totalTime}!`);
+    }
     //test function
     eatSnickers(message){
         //console.log("Enter this.eatSnickers method");
@@ -50,7 +85,7 @@ class Player{
 
    //XP 100, 300 ,600, 1000
     catchFish(level){
-        let fish;
+        let fish = {};
         let catchPower = level*100 * Math.random();//From 1 to 100*level
 
         if(catchPower < 80){
@@ -68,17 +103,23 @@ class Player{
             fish.xp = 45;
             return fish;
         }
+        else if(catchPower < 320){
+            fish.type = "tuna";
+            fish.xp = 60;
+            return fish;
+        }
 
 
     }
-    fish(message){//wanted to do this recursively but passing class functions is nonsense bc of .this scope I guess?
+    fish(message){
       
         if(this.activityTimeout == ""){//check if busy multiple ways to track this
            
             var self = this;
-            self.activityTimeout = setInterval(function(){self.fishLoop(message)}, 5000);
+            self.activityTimeout = setInterval(function(){self.fishLoop(message)}, 5000);//this way multiple people can do it as its an object function...
             this.currentAction = "Fishing";
             this.lastActionTime = Date.now();
+           // console.log(`${message.author} starts fishing ${this.lastActionTime}`);
          return;
             
         }
@@ -86,26 +127,31 @@ class Player{
     }
     fishLoop(message){
    //    fishLoop = (message)=>{
-        if(Math.random() > 0.9){//Tie into fishing skill
-            //TODO type of fish and inventory
-            let caughtFish = catchFish(this.fishingLvl);
+        if(Math.random() > 0.8){//catch success
+            //TODO inventory
+            let caughtFish = this.catchFish(this.fishingLvl);
             message.channel.send(`${message.author.username} caught a fish! A ${caughtFish.type} :fishing_pole_and_fish: +${caughtFish.xp}XP`);
             clearInterval(this.activityTimeout);
             this.activityTimeout = "";
             this.currentAction = "none";
+            this.lastActionTaken = "fishing";
             this.fishCaught++;
             this.fishingXP += caughtFish.xp;
 
-            if(this.fishingXP > (this.fishingLvl*100)){
+            if(this.fishingXP >= (this.fishingLvl*100)){
                 this.XP -= this.fishingLvl*100;
                 this.fishingLvl++;
-                message.channel.send(`${message.author.username} has leveled up! Fishing level ${this.fishingLvl}!`);
+                message.channel.send(`${message.author.username} has leveled up! Fishing level ${this.fishingLvl}! :fireworks: :shark:`);
             }
+
+            this.needsSaved = true;
         }
        // else console.log("Tick");
     }
 
     setClass(){//sets random class from options
+        if(this.characterClass != "peasant") return;
+
         var classIndex = Math.floor(Math.random()*classOptions.length);
         this.characterClass = classOptions[classIndex];
         

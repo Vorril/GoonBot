@@ -3,10 +3,14 @@
  */
 const Player = require("../player");
 const fs = require("fs");
-const { prefix } = require("../config.json");
+
 
 // Player Variables
 let playerList = [];
+
+ /***************************************
+  *********    STARTUP LOAD     *********
+  ***************************************/
 
 //load players from file during startup
 //ToDo implement restarting of long actions based on actionProgress
@@ -21,25 +25,50 @@ fs.readFile("./playerData.json", function (errLoad, data) {
     });
     console.log("Loaded players:" + playerList.length);
 
-    //loadExternals();
-    //need to conver to player class;
   }
 }); //readFile
 
-function savePlayers(playerList) {
+ /***************************************
+  *********       SAVING        *********
+  ***************************************/
+function checkForSaveFlags(){
+  let saveSomething = false;
   playerList.forEach(element => {
-    if(element.activityTimeout != ""){
-      clearInterval(element.activityTimeout);
-      element.activityTimeout = ""; //TODO implement saving for longer actions
-      element.actionProgress = Date.now() - element.lastActionTime;
+    if(element.needsSaved){
+      saveSomething = true;
+      element.needsSaved = false;
     }
-    element.currentAction = "None";
+  });
+  if(saveSomething){
+    console.log("Saved player data");
+    savePlayers();
+  }
+}
+setInterval(checkForSaveFlags, 60000);
+
+function savePlayers() {
+  let tempIntervalArr = [];
+  playerList.forEach(element => {
+    //temporary fix timeout objects cant be saved definitely need a better solution
+    tempIntervalArr.push(element.activityTimeout);
+    element.activityTimeout = "";
+
   });
 
-  //Write each player to individual file? would make saving easier
+
+  
   fs.writeFile("./playerData.json", JSON.stringify(playerList), function (
     err
-  ) {}); //TODO Fails if a member in the player class is a class(timeout from intervals causing but need to olve for inventory at some point)
+  ) {}) //TODO Fails if a member in the player class is a class(timeout from intervals causing but need to olve for inventory at some point)
+
+
+  //temporary fix reload player objects and reassign any timeoutObjects. this way we avoid saving those:
+
+playerList.forEach((element2,index) =>{
+  element2.activityTimeout = tempIntervalArr[index];//relaceing value that couldnt be saved
+});
+
+
 }
 
 const checkForPlayer = (checkTag, playerList) => {
@@ -65,20 +94,28 @@ const handleRPGCommands = (commandRead, message) => {
       player.printStats(message);
       break;
 
+
+    case "!current":
+    case "!activity":
+    case "!busy":
+      player = checkForPlayer(message.author.tag, playerList);
+      player.checkActivity(message);
+
+      break;
+
     case "!snickers": {
       player = checkForPlayer(message.author.tag, playerList);
 
       player.eatSnickers(message);
 
-      savePlayers(playerList); //Do we want to update the whole savefile on every change?
       break; //snickers
     }
 
     case "!fish":
       player = checkForPlayer(message.author.tag, playerList);
       player.fish(message);
-      console.log(player.fishingMember);
       break;
+    
 
     case "!addtestplayer":
       let randomNumber = Math.floor(Math.random() * 10000);
