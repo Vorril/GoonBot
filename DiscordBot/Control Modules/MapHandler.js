@@ -1,21 +1,30 @@
 const MapData = {
     mapLocations : [
         {
-         name : "Home",
-         connections : ["Woods", "City"],
-         difficulty : 1,
-         enemies : ["rat"]
-         
+            name : "Home",
+            connections : ["Woods", "City"],
+            difficulty : 1,
+            enemies : ["rat"],
+            POI : ["Fridge", "TV"]
         },
         {
             name: "City",
-            connections : ["Home", "Mountains"],
+            connections : ["Home", "School", "Mountains"],
             difficulty : 2,
-            enemies : ["hobo", "rat", "cop"]
+            enemies : ["hobo", "rat", "cop"],
+            POI : ["Hospital", "Wallmart"]
         }
     ]
 
 
 }
 
-module.exports = MapData;
+const getLocationInfo = (location) => {
+    MapData.mapLocations.forEach((element) => {
+        if(element.name == location)
+            return element;
+    });
+    return "Not found";
+};
+
+module.exports = {getLocationInfo};

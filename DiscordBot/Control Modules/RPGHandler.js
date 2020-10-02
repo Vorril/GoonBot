@@ -52,7 +52,9 @@ function savePlayers() {
     //temporary fix timeout objects cant be saved definitely need a better solution
     tempIntervalArr.push(element.activityTimeout);
     element.activityTimeout = "";
-
+    if(element.currentAction != "None"){//Case where they are in the middle of trying to do something, will need to be fixed on loading
+      element.actionProgress = Date.now()-element.lastActionTime;
+    }
   });
 
 
@@ -64,8 +66,8 @@ function savePlayers() {
 
   //temporary fix reload player objects and reassign any timeoutObjects. this way we avoid saving those:
 
-playerList.forEach((element2,index) =>{
-  element2.activityTimeout = tempIntervalArr[index];//relaceing value that couldnt be saved
+playerList.forEach((element2,index) =>{//Will this ever asynchronously cause fuck ups? Assigning an outdated timer?
+  element2.activityTimeout = tempIntervalArr[index];//relacing value that couldnt be saved
 });
 
 
@@ -86,7 +88,7 @@ const checkForPlayer = (checkTag, playerList) => {
 };
 
 
-const handleRPGCommands = (commandRead, message) => {
+const handleRPGCommands = (commandRead, commandModifier, message) => {
   let player;
   switch (commandRead) {
     case "!stats":
@@ -114,8 +116,22 @@ const handleRPGCommands = (commandRead, message) => {
     case "!fish":
       player = checkForPlayer(message.author.tag, playerList);
       player.fish(message);
+
+      
       break;
     
+      case "!explore":
+        player = checkForPlayer(message.author.tag, playerList);
+        player.explore(message);
+
+
+      break;
+
+      case "!travel":
+        player = checkForPlayer(message.author.tag, playerList);
+        player.travel(message, commandModifier);
+
+      break;
 
     case "!addtestplayer":
       let randomNumber = Math.floor(Math.random() * 10000);
@@ -125,9 +141,9 @@ const handleRPGCommands = (commandRead, message) => {
       ) {});
       break;
 
-    case "!changeclass":
+    case "!getClass":
       player = checkForPlayer(message.author.tag, playerList);
-      player.setClass();
+      player.setClass(message);
       savePlayers(playerList);
       break;
 

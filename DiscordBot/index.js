@@ -171,12 +171,12 @@ client.on("message", (message) => {
     /***************************************
      *****       HANDLE RPG GAME       *****
      ***************************************/
-    let rpgRes = handleRPGCommands(commandRead, message);
+    let rpgRes = handleRPGCommands(commandRead, commandModifier, message);
 
     /***************************************
      *****    HANDLE MISC COMMANDS     *****
      ***************************************/
-    let miscRes = handleMiscCommands(commandRead, message, process);
+    let miscRes = handleMiscCommands(commandRead, commandModifier, message, process);
 
     /***************************************
      *****   HANDLE AUDIO COMMANDS     *****

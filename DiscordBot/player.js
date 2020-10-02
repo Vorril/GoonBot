@@ -4,13 +4,16 @@ class Player{
     
     constructor(data){//data = JSON.parse() object
         Object.assign(this, data);
+        this.restartActivity();
     }
     
     playerTag = "UNSET"; 
+    location = "Home";
     snickersEaten = 0;
     characterClass = "Peasant";
     gold = 0;
     combatLvl = 1; combatXP = 0; HP = 10;
+    adventuringLvl = 1; travelDestination = "";
     weapon = {};
     armor = {};
     fishingLvl = 1; fishingXP = 0; fishCaught = 0;
@@ -55,6 +58,31 @@ class Player{
 
       message.channel.send(`${message.author} has been ${this.currentAction} for ${totalTime}!`);
     }
+
+    restartActivity(){//For restarting an activity on reload
+        if(this.currentAction != "None" && this.actionProgress != -1){
+            switch (this.currentAction) {
+                case "Fishing":
+                    
+                    break;
+                case "Exploring":
+                    this.explore({}, true);
+                    break;
+
+                case "Traveling":
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        else{//make sure data starts in a good setup
+            this.currentAction = "None";
+            this.actionProgress = -1;
+        }
+    }
+
     //test function
     eatSnickers(message){
         //console.log("Enter this.eatSnickers method");
@@ -82,6 +110,10 @@ class Player{
         }
         message.channel.send(stringFeedback);
     };
+
+/***************************************
+  *********      FISHING       *********
+  ***************************************/
 
    //XP 100, 300 ,600, 1000
     catchFish(level){
@@ -113,7 +145,7 @@ class Player{
     }
     fish(message){
       
-        if(this.activityTimeout == ""){//check if busy multiple ways to track this
+        if(this.currentAction == "None"){//check if busy multiple ways to track this
            
             var self = this;
             self.activityTimeout = setInterval(function(){self.fishLoop(message)}, 5000);//this way multiple people can do it as its an object function...
@@ -131,10 +163,15 @@ class Player{
             //TODO inventory
             let caughtFish = this.catchFish(this.fishingLvl);
             message.channel.send(`${message.author.username} caught a fish! A ${caughtFish.type} :fishing_pole_and_fish: +${caughtFish.xp}XP`);
+           
+           //Cleanup action tracking
             clearInterval(this.activityTimeout);
             this.activityTimeout = "";
-            this.currentAction = "none";
-            this.lastActionTaken = "fishing";
+            this.currentAction = "None";
+            this.lastActionTaken = "Fishing";
+            this.actionProgress = -1;
+
+            //XP and leveling
             this.fishCaught++;
             this.fishingXP += caughtFish.xp;
 
@@ -149,12 +186,68 @@ class Player{
        // else console.log("Tick");
     }
 
-    setClass(){//sets random class from options
-        if(this.characterClass != "peasant") return;
+  /***************************************
+  *********       EXPLORE        *********
+  ***************************************/
+
+  explore(message, loading = false){
+    if(this.currentAction == "None" && loading == false){//check if busy multiple ways to track this
+           
+        var self = this;
+        self.activityTimeout = setTimeout(function(){self.exploreCallback(message)}, 30*60000);//this way multiple people can do it as its an object function...
+        this.currentAction = "Exploring";
+        this.lastActionTime = Date.now();
+     return;
+        
+    }
+    else if(this.currentAction != "None") message.channel.send(`${message.author.username} is busy ${this.currentAction}`);//busy doing what could probably extract this to a function it will happen often
+
+    else if(loading){
+        //need a defualt channel or something to use, maybe send a PM by default instead?
+    }
+  }
+  exploreCallback(message){
+    //TODO calculate success odds base on Map.diffuclty and player.adventuring lvl
+    let output = `${this.playerTag} has succesfully explored ${this.location}!\n`;
+    let locationInfo = Map.getLocationInfo(this.location);
+
+    output += `Nieghboring locations were scouted: `;
+    locationInfo.connections.forEach(element => {
+        output += element+ ' ';
+    });
+
+    output += `\n Potential enemies scouted: `;
+    locationInfo.enemies.forEach(element => {
+        output += element+ ' ';
+    });
+
+    output += `\n Points of interest scouted: `;
+    locationInfo.POI.forEach(element => {
+        output += element+ ' ';
+    });
+
+    message.channel.send(output);
+
+  }
+
+  travel(message, destination){
+
+  }
+
+
+  /***************************************
+  *********    MISCELLANEOUS     *********
+  ***************************************/
+
+    setClass(message){//sets random class from options
+        if(this.characterClass != "peasant"){
+            message.channel.send("You already have a class!");
+            return;  
+        } 
 
         var classIndex = Math.floor(Math.random()*classOptions.length);
         this.characterClass = classOptions[classIndex];
-        
+        message.channel.send(`Your new class is ${this.characterClass}!`);
     }
 
     printStats(message){
