@@ -52,6 +52,19 @@ function isTimeUnit(parseString){
     case "d":
     case "day":
     case "days":
+    case "w":
+    case "wk":
+    case "wks":
+    case "week":
+    case "weeks":
+    case "mo":
+    case "month":
+    case "months":
+    case "y":
+    case "yr":
+    case "yrs":
+    case "year":
+    case "years":
     //more
       return true;
       break;
@@ -96,7 +109,7 @@ function reminder(message, what, when = 3600000){
       timeParse = (timeParse.substring(0, unitIndex)).toLowerCase();
 
     }
-  //console.log(`TimeUnit ${timeUnit}`);
+  
   
   if(timeParse.includes(".")){
     timeNumber = parseFloat(timeParse);
@@ -109,8 +122,6 @@ function reminder(message, what, when = 3600000){
     message.channel.send("GoonBot not understand time");
     return;
   }
-
-   // console.log(`timeNumber ${timeNumber}`);
 
     switch (timeUnit) {
       case "ms":
@@ -140,15 +151,31 @@ function reminder(message, what, when = 3600000){
       case "days":
         when = timeNumber * (1000 * 60 * 60 * 24);
         break;
-
+      case "w":
+      case "wk":
+      case "wks":
+      case "week":
+      case "weeks":
+          when = timeNumber * (1000 * 60 * 60 * 24 * 7);
+          break;
+      case "mo":
+      case "month":
+      case "months":
+        when = timeNumber * (1000 * 60 * 60 * 24 * 31);
+        break;
+      case "y":
+      case "yr":
+      case "yrs":
+      case "year":
+      case "years":
+        when = timeNumber * (1000 * 60 * 60 * 24 * 365);
+        break;
       default:
         message.channel.send("GoonBot not understand time");
         return;
         break;
     }
     when = Math.floor(when);
-    //console.log(`When ${when}`);
-
 
   let msg = "";
 
@@ -156,12 +183,17 @@ function reminder(message, what, when = 3600000){
     msg += (element+' ');
   });
   
- // console.log(`msg: ${msg}`);
 
  if(msg == "") msg = "This is a reminder!";
- 
+
   let reminderTimer = setTimeout(function(){message.author.send(msg);}, when);
   message.channel.send(`GoonBot remind you in ${timeNumber} ${timeUnit}!`);
-  };
+  
+//console.log(`msg: ${msg}
+//timeNumber ${timeNumber}
+//TimeUnit ${timeUnit}
+//When ${when}
+//`);
+};
 
 module.exports = { handleMiscCommands };

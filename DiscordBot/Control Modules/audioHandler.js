@@ -48,8 +48,20 @@ const handleAudioCommands = (commandRead, message, playAudio) => {
       }, deleteDelay);
       break;
       case "!know":
-      case "!trash":
-      playAudio(message.member.voice.channel, "./Audio/trash.mp3");
+        case "!trash":
+        playAudio(message.member.voice.channel, "./Audio/trash.mp3");
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
+        break;
+      case "!stfu":
+      playAudio(message.member.voice.channel, "./Audio/stfu.mp3");
+      setTimeout(() => {
+        message.delete();
+      }, deleteDelay);
+      break;
+      case "!chickenwing":
+      playAudio(message.member.voice.channel, "./Audio/chickenwing.mp3");
       setTimeout(() => {
         message.delete();
       }, deleteDelay);
