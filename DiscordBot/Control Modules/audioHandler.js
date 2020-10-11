@@ -11,6 +11,7 @@ const handleAudioCommands = (commandRead, message, playAudio) => {
         message.delete();
       }, deleteDelay);
       break;
+    case "!amazing":
     case "!amazin":
       playAudio(message.member.voice.channel, "./Audio/amazin.wav");
       setTimeout(() => {
@@ -61,7 +62,35 @@ const handleAudioCommands = (commandRead, message, playAudio) => {
       }, deleteDelay);
       break;
       case "!chickenwing":
-      playAudio(message.member.voice.channel, "./Audio/chickenwing.mp3");
+        if(Math.random()>0.2){
+          playAudio(message.member.voice.channel, "./Audio/chickenwing.mp3");}
+        else{
+          playAudio(message.member.voice.channel, "./Audio/chickenwing2.mp3");}
+          
+      setTimeout(() => {
+        message.delete();
+      }, deleteDelay);
+      break;
+      case "!no":
+      playAudio(message.member.voice.channel, "./Audio/no.mp3");
+      setTimeout(() => {
+        message.delete();
+      }, deleteDelay);
+      break;
+      case "!guilty":
+      playAudio(message.member.voice.channel, "./Audio/guilty.mp3");
+      setTimeout(() => {
+        message.delete();
+      }, deleteDelay);
+      break;
+      case "!murder":
+      playAudio(message.member.voice.channel, "./Audio/murder.mp3");
+      setTimeout(() => {
+        message.delete();
+      }, deleteDelay);
+      break;
+      case "!again":
+      playAudio(message.member.voice.channel, "./Audio/again.mp3");
       setTimeout(() => {
         message.delete();
       }, deleteDelay);
