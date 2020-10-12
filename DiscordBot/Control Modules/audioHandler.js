@@ -95,6 +95,19 @@ const handleAudioCommands = (commandRead, message, playAudio) => {
         message.delete();
       }, deleteDelay);
       break;
+      case "!blastin":
+      playAudio(message.member.voice.channel, "./Audio/again.mp3");
+      setTimeout(() => {
+        message.delete();
+      }, deleteDelay);
+      break;
+      case "!finish":
+      case "!croissant":
+      playAudio(message.member.voice.channel, "./Audio/again.mp3");
+      setTimeout(() => {
+        message.delete();
+      }, deleteDelay);
+      break;
 
     default:
       return "unfound";
