@@ -51,6 +51,7 @@ const setEntry = (commandModifier, message, playAudio)=>{
 }
 
 const handleEntryAudio = (currentChannel, userID, playAudio) =>  {
+  //Check if user is in the cache 
   let userIndex = entryList.findIndex(function(object){
     return object.user === userID;
   });
@@ -58,6 +59,7 @@ const handleEntryAudio = (currentChannel, userID, playAudio) =>  {
   let clipToUse;
   userIndex == -1 ? clipToUse = "!beta" : clipToUse = entryList[userIndex].clip;
 
+  //Create an audio call, nesting channel info in a fake message. Message is generally a more useful parameter contains a lot more info but ehre we dont have actually have one
   let fakeMessage = {member:{voice:{channel:currentChannel}},delete(){}};
 
   handleAudioCommands(clipToUse, "", fakeMessage, playAudio);
@@ -171,18 +173,23 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
       break;
       case "!finish":
       case "!croissant":
-      playAudio(message.member.voice.channel, "./Audio/croissant.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-
-    case "!slutmaker":
-      playAudio(message.member.voice.channel, "./Audio/slutmaker.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, 350);
-      break;
+        playAudio(message.member.voice.channel, "./Audio/croissant.mp3");
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
+        break;
+        case "!slutmaker":
+        playAudio(message.member.voice.channel, "./Audio/slutmaker.mp3");
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
+        break;
+        case "!afraid":
+        playAudio(message.member.voice.channel, "./Audio/afraid.mp3");
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
+        break;
 
     default:
       return "unfound";

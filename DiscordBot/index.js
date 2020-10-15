@@ -40,7 +40,7 @@ var timeAllowed = -1;
 /*
  *  static functions
  */
-function playAudio(voiceChannel, audioFile) {
+function playAudio(voiceChannel, audioFile) {//should refactor but it mentions a static var in this js
   //console.log(voiceChannel.id);
   isReady = false;
   if (!voiceChannel) {
@@ -73,7 +73,7 @@ function playAudio(voiceChannel, audioFile) {
 
   //Setup leaving and cleanup:
   currentChannel = voiceChannel;
-  timeAllowed = Date.now() + 3600000;
+  timeAllowed = Date.now() + 3600000;//1 hr
   //setTimeout(() => { message.delete(); }, 350);
 }
 
@@ -111,7 +111,7 @@ client.on("voiceStateUpdate", (oldUserState, newUserState) => {
      
     let cachedUser = client.users.fetch(newUserState.id);
     //console.log(cachedUser);
-     cachedUser.then(function(promisedUser){
+     cachedUser.then(function(promisedUser){//Honestly could just use ID rather than get the tag
        //console.log(promisedUser);
       userTag = promisedUser.username+"#"+promisedUser.discriminator;
       //console.log(userTag);
