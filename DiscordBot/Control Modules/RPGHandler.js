@@ -3,14 +3,17 @@
  */
 const Player = require("../player");
 const fs = require("fs");
-const { prefix } = require("../config.json");
 
-let commandList = new Array(); //Holds objects which should be single functions named by their !command
 
 // Player Variables
 let playerList = [];
 
+ /***************************************
+  *********    STARTUP LOAD     *********
+  ***************************************/
+
 //load players from file during startup
+//ToDo implement restarting of long actions based on actionProgress
 fs.readFile("./playerData.json", function (errLoad, data) {
   //Doing it with the callback waits to ensure file loaded
   if (errLoad) {
@@ -22,27 +25,52 @@ fs.readFile("./playerData.json", function (errLoad, data) {
     });
     console.log("Loaded players:" + playerList.length);
 
-    //loadExternals();
-    //need to conver to player class;
   }
 }); //readFile
 
-loadExternals();
+ /***************************************
+  *********       SAVING        *********
+  ***************************************/
+function checkForSaveFlags(){
+  let saveSomething = false;
+  playerList.forEach(element => {
+    if(element.needsSaved){
+      saveSomething = true;
+      element.needsSaved = false;
+    }
+  });
+  if(saveSomething){
+    console.log("Saved player data");
+    savePlayers();
+  }
+}
+setInterval(checkForSaveFlags, 60000);
 
-commandList.push({
-  hello: function () {
-    console.log("I was declared in index");
-  },
+function savePlayers() {
+  let tempIntervalArr = [];
+  playerList.forEach(element => {
+    //temporary fix timeout objects cant be saved definitely need a better solution
+    tempIntervalArr.push(element.activityTimeout);
+    element.activityTimeout = "";
+    if(element.currentAction != "None"){//Case where they are in the middle of trying to do something, will need to be fixed on loading
+      element.actionProgress = Date.now()-element.lastActionTime;
+    }
+  });
+
+
+  
+  fs.writeFile("./playerData.json", JSON.stringify(playerList), function (
+    err
+  ) {}) //TODO Fails if a member in the player class is a class(timeout from intervals causing but need to olve for inventory at some point)
+
+
+  //temporary fix reload player objects and reassign any timeoutObjects. this way we avoid saving those:
+
+playerList.forEach((element2,index) =>{//Will this ever asynchronously cause fuck ups? Assigning an outdated timer?
+  element2.activityTimeout = tempIntervalArr[index];//relacing value that couldnt be saved
 });
-//commandList[0]["hello"]();
 
-function loadExternals() {
-  //These 5 lines could further be modularized they should be the same for every import
-  const Fishing = require("../Extensions/fishing.js");
-  var protoFishing = Fishing.importProperties(); // imports all player related properties
-  Object.assign(Player.prototype, protoFishing);
-  var tempArray = commandList.concat(Fishing.importCommands()); // imports commands which likely call the added functions above
-  commandList = tempArray;
+
 }
 
 const checkForPlayer = (checkTag, playerList) => {
@@ -59,14 +87,8 @@ const checkForPlayer = (checkTag, playerList) => {
   return playerList[playerList.length - 1];
 };
 
-function savePlayers(playerList) {
-  //Write each player to individual file? would make saving easier
-  fs.writeFile("./playerData.json", JSON.stringify(playerList), function (
-    err
-  ) {}); //TODO Fails if a member in the player class is a class(timeout from intervals causing but need to olve for inventory at some point)
-}
 
-const handleRPGCommands = (commandRead, message) => {
+const handleRPGCommands = (commandRead, commandModifier, message) => {
   let player;
   switch (commandRead) {
     case "!stats":
@@ -74,19 +96,41 @@ const handleRPGCommands = (commandRead, message) => {
       player.printStats(message);
       break;
 
+
+    case "!current":
+    case "!activity":
+    case "!busy":
+      player = checkForPlayer(message.author.tag, playerList);
+      player.checkActivity(message);
+
+      break;
+
     case "!snickers": {
       player = checkForPlayer(message.author.tag, playerList);
 
       player.eatSnickers(message);
 
-      savePlayers(playerList); //Do we want to update the whole savefile on every change?
       break; //snickers
     }
 
     case "!fish":
       player = checkForPlayer(message.author.tag, playerList);
       player.fish(message);
-      console.log(player.fishingMember);
+
+      
+      break;
+    
+      case "!explore":
+        player = checkForPlayer(message.author.tag, playerList);
+        player.explore(message);
+
+
+      break;
+
+      case "!travel":
+        player = checkForPlayer(message.author.tag, playerList);
+        player.travel(message, commandModifier);
+
       break;
 
     case "!addtestplayer":
@@ -97,33 +141,18 @@ const handleRPGCommands = (commandRead, message) => {
       ) {});
       break;
 
-    case "!changeclass":
+    case "!getClass":
       player = checkForPlayer(message.author.tag, playerList);
-      player.setClass();
+      player.setClass(message);
       savePlayers(playerList);
       break;
 
-    case "!commandlist":
-      var keyNames = "";
-      commandList.forEach((element) => {
-        keyNames += Object.keys(element) + "\n";
-      });
-      console.log("Commands found in commandList:" + "\n" + keyNames);
-      break;
 
     default:
       return "unfound";
       break;
   }
 
-  commandList.forEach((element) => {
-    //check dynamically loaded commands
-    var keyName = Object.keys(element); // Based on how commandlist is intended to be used should only be one key one func
-    if (prefix + keyName == commandRead) {
-      var player = checkForPlayer(message.author.tag);
-      element[keyName](player, message); //way to do player.() ?
-    }
-  });
 };
 
 module.exports = { handleRPGCommands };
