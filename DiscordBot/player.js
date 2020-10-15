@@ -1,5 +1,6 @@
 const Map = require("./Control Modules/MapHandler.js");
 
+
 class Player{
     
     constructor(data){//data = JSON.parse() object
@@ -17,6 +18,7 @@ class Player{
     weapon = {};
     armor = {};
     fishingLvl = 1; fishingXP = 0; fishCaught = 0;
+    entrySound = "";
     //todo inventory array object
 
     currentAction = "None";//Might become innacurate if something is in progress and bot crashes

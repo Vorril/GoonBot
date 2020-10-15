@@ -30,7 +30,7 @@ const {
 
 const { handleRPGCommands } = require("./Control Modules/RPGHandler.js");
 
-const { handleAudioCommands } = require("./Control Modules/audioHandler.js");
+const { handleAudioCommands, handleEntryAudio } = require("./Control Modules/audioHandler.js");
 
 //Bot variables:
 var isReady = false;
@@ -106,9 +106,21 @@ client.on("voiceStateUpdate", (oldUserState, newUserState) => {
     oldUserState.channelID != newUserState.channelID &&
     newUserState.channelID == currentChannel.id
   ) {
+
+    let userTag;
+     
+    let cachedUser = client.users.fetch(newUserState.id);
+    //console.log(cachedUser);
+     cachedUser.then(function(promisedUser){
+       //console.log(promisedUser);
+      userTag = promisedUser.username+"#"+promisedUser.discriminator;
+      //console.log(userTag);
+    });
+
     if (isReady)
       setTimeout(() => {
-        playAudio(currentChannel, "./Audio/beta.mp3");
+       // playAudio(currentChannel, "./Audio/beta.mp3");
+       handleEntryAudio(currentChannel, userTag, playAudio);
       }, 350);
   }
 });
@@ -181,7 +193,7 @@ client.on("message", (message) => {
     /***************************************
      *****   HANDLE AUDIO COMMANDS     *****
      ***************************************/
-    let audioRes = handleAudioCommands(commandRead, message, playAudio);
+    let audioRes = handleAudioCommands(commandRead, commandModifier, message, playAudio);
 
     const resArr = [helperRes, rpgRes, miscRes, audioRes];
 

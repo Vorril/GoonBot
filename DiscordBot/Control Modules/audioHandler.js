@@ -1,10 +1,78 @@
 
+const fs = require("fs");
 
-const handleAudioCommands = (commandRead, message, playAudio) => {
+let entryList = [];//[{"user":"userTag","clip":"!clip"},{...},{...}...]
+
+fs.readFile("./Audio/userEntry.json", function (errLoad, data) {
+  if (errLoad) {
+    console.log("Failed to load entry audio settings");
+  } 
+  else {
+    entryList = JSON.parse(data); 
+  }
+  console.log(`Loaded ${entryList.length} entry audio settings`);
+}); //readFile
+
+
+const setEntry = (commandModifier, message, playAudio)=>{
+  //Cleanup/check input
+  if(!commandModifier.startsWith("!")){
+    commandModifier = '!' + commandModifier;
+  }
+  if(commandModifier == "!enter") return "unfound";//cheeky cunt
+
+  //Checking if clip is found
+  let checkAudio = handleAudioCommands(commandModifier, "", message, playAudio);
+
+  if(checkAudio == "unfound") return "unfound";
+
+  //Preparing and saving data
+  //Should check that none of this is undefined
+  let settingUser = message.author.tag;
+  let userData = {user:settingUser, clip:commandModifier};
+
+  let userIndex = entryList.findIndex(function(object){
+    return object.user === userData.user;
+  });
+
+  if(userIndex == -1)
+    entryList.push(userData);
+  else{
+    entryList[userIndex].clip = userData.clip;
+  }
+
+  let entryListJSON = JSON.stringify(entryList);
+  console.log(entryListJSON);
+  fs.writeFile("./Audio/userEntry.json", entryListJSON, 
+    function (err) {}//{console.log("Failed to save audio entry data")} //Always throws err but works?
+  );
+
+  return "updated";
+}
+
+const handleEntryAudio = (currentChannel, userID, playAudio) =>  {
+  let userIndex = entryList.findIndex(function(object){
+    return object.user === userID;
+  });
+
+  let clipToUse;
+  userIndex == -1 ? clipToUse = "!beta" : clipToUse = entryList[userIndex].clip;
+
+  let fakeMessage = {member:{voice:{channel:currentChannel}},delete(){}};
+
+  handleAudioCommands(clipToUse, "", fakeMessage, playAudio);
+};
+
+const handleAudioCommands = (commandRead, commandModifier, message, playAudio) => {
   let deleteDelay = 350;
  
   switch (commandRead) {
-    //audio
+    //set personalized audio clips
+    case "!enter":
+      setEntry(commandModifier, message, playAudio);
+    break;
+
+    //Clip library
     case "!beta":
       playAudio(message.member.voice.channel, "./Audio/beta.mp3");
       setTimeout(() => {
@@ -96,14 +164,14 @@ const handleAudioCommands = (commandRead, message, playAudio) => {
       }, deleteDelay);
       break;
       case "!blastin":
-      playAudio(message.member.voice.channel, "./Audio/again.mp3");
+      playAudio(message.member.voice.channel, "./Audio/blastin.mp3");
       setTimeout(() => {
         message.delete();
       }, deleteDelay);
       break;
       case "!finish":
       case "!croissant":
-      playAudio(message.member.voice.channel, "./Audio/again.mp3");
+      playAudio(message.member.voice.channel, "./Audio/croissant.mp3");
       setTimeout(() => {
         message.delete();
       }, deleteDelay);
@@ -115,4 +183,4 @@ const handleAudioCommands = (commandRead, message, playAudio) => {
   }
 };
 
-module.exports = { handleAudioCommands };
+module.exports = { handleAudioCommands, handleEntryAudio };
