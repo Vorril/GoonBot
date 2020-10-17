@@ -107,20 +107,20 @@ client.on("voiceStateUpdate", (oldUserState, newUserState) => {
     newUserState.channelID == currentChannel.id
   ) {
 
-    let userTag;
+    //let userTag;
      
-    let cachedUser = client.users.fetch(newUserState.id);
+    //let cachedUser = client.users.fetch(newUserState.id);
     //console.log(cachedUser);
-     cachedUser.then(function(promisedUser){//Honestly could just use ID rather than get the tag
+     //cachedUser.then(function(promisedUser){//Honestly could just use ID rather than get the tag
        //console.log(promisedUser);
-      userTag = promisedUser.username+"#"+promisedUser.discriminator;
+      //userTag = promisedUser.username+"#"+promisedUser.discriminator;
       //console.log(userTag);
-    });
+    //});
 
     if (isReady)
       setTimeout(() => {
        // playAudio(currentChannel, "./Audio/beta.mp3");
-       handleEntryAudio(currentChannel, userTag, playAudio);
+       handleEntryAudio(currentChannel, newUserState.id, playAudio);
       }, 350);
   }
 });
@@ -134,6 +134,13 @@ client.on("message", (message) => {
     message.author.tag == "GoonBot#3603"
   )
     return;
+
+    if(typeof(message.channel) == "DMChannel"){//message was DMd to goobot
+      
+
+      return;
+    }
+
   // !commandRead <commandModifier> //careful to check if no mods given
 
   //Todo See if anything misbehaves on untrimmed input
@@ -173,7 +180,7 @@ client.on("message", (message) => {
     /***************************************
      *****  HANDLE ROCK PAPER SCISSOR  *****
      ***************************************/
-    handleRPS(commandModifier, message);
+    handleRPS(commandModifier, message);// TODO look into await messages function
   } else if (isReady) {
     /***************************************
      *****       HANDLE HELPERS        *****

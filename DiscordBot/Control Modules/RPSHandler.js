@@ -1,98 +1,127 @@
-let rpsQueue = "";
-let rpsChoice;
+
+let RPScollector = {};
+let filteredMsgList = [];
+
+const RPSfilter = (filteredMsg) => {
+//trim if people start with '!' ?
+
+  switch (filteredMsg.content.toLowerCase()) {
+    case "rock":
+    case "r":
+    case "paper":
+    case "p":
+    case "scissor":
+    case "s":
+
+  console.log(`Filtered: ${filteredMsg.content}`);//should only add on succesful
+  let msgAuthor = filteredMsg.author.username;
+
+  let userIndex = filteredMsgList.findIndex(function(object){
+    return object.userName == msgAuthor;
+  });
+
+  if(userIndex == -1){//adding choice
+    filteredMsgList.push({userName:msgAuthor, msg:filteredMsg.content.toLowerCase()});
+
+
+    if(++RPScollector.numCollected >= RPScollector.maxCollects){//should see about changing to numFilteredfor application@!
+      RPScollector.stop("Hit collect limit");}
+
+    filteredMsg.delete();
+
+    return true;
+  }
+  else return false;//They already submitted a choice
+      break;
+  
+    default:
+      return false;
+      break;
+  }
+}
+
 
 const handleRPS = (commandModifier, message) => {
-  const validCommands = ["rock", "r", "paper", "p", "scizzor", "s"];
-  if (!validCommands.includes(commandModifier)) {
-    message.delete();
-    message.channel.send("Invalid choice: rock/paper/scizzor/r/p/s");
-    return;
-  }
-  //First player queues up:
-  else if (rpsQueue == "") {
-    //should probably be a per channel function?
-    rpsQueue = message.author;
-    message.channel.send(
-      `${rpsQueue} wants to play rock paper scizzors! Type !rps <rock/paper/scizzor/r/p/s>`
-    );
-    message.delete();
+  console.log("Enter rps func call");
 
-    rpsChoice = commandModifier;
-    //Simplify for logic comparison later:
-    if (rpsChoice == "rock") rpsChoice = "r";
-    if (rpsChoice == "paper") rpsChoice = "p";
-    if (rpsChoice == "scizzor") rpsChoice = "s";
-    return;
-  }
-  //Else player 2 also w/ a valid input:
-  else {
-    let choice2 = commandModifier;
-    if (choice2 == "rock") choice2 = "r";
-    if (choice2 == "paper") choice2 = "p";
-    if (choice2 == "scizzor") choice2 = "s";
+  //Setup numPLayers
+let numPlayers = 2;
+let playerNumParse = parseInt(commandModifier);
+if(!isNaN(playerNumParse) && playerNumParse > 2){
+  numPlayers = playerNumParse;}
 
-    let outputStr = `Rock Paper Scissor Results:\n`;
+//Initiate collector
+ if(Object.keys(RPScollector).length===0){//RPS game currently innactive
+  //console.log("Initiating RPScollector");
+  RPScollector = message.channel.createMessageCollector(RPSfilter, {time:20000});//, {max:numPlayers});// max doesnt work for some reason
+  
+  RPScollector.maxCollects = numPlayers;// max setting of messagecollector class should work but isnt initializing or im doing it wrong
+  RPScollector.numCollected = 0;
+  
 
-    if (rpsChoice == choice2) {
-      const wordChoice1 =
-        rpsChoice === "r"
-          ? ":rock:"
-          : rpsChoice === "p"
-          ? ":page_facing_up:"
-          : ":scissors:";
-      const wordChoice2 =
-        choice2 === "r"
-          ? ":rock:"
-          : choice2 === "p"
-          ? ":page_facing_up:"
-          : ":scissors:";
+  RPScollector.on("collect", collectedMsg => {
+   // console.log(`Collected: ${collectedMsg.content}`);
+  
+  });
 
-      message.channel.send(
-        outputStr +
-          `${rpsQueue} (${wordChoice1}) and ${message.author} (${wordChoice2}) tied`
-      );
+  RPScollector.on("end", collectedList => {
+    //console.log("end");
+    //console.log(filteredMsgList);
 
-      message.delete();
-      rpsQueue = "";
-      rpsChoice = "";
-      return;
-    }
+    let numRock = 0;
+    let numPaper = 0;
+    let numScissor = 0;
 
-    let p1Wins = true; //assume p1 wins and only check fail cases
-    //Jas you should do this with Ternary operator for shits
-    //Challenge Accepted
-    if (rpsChoice == "r" && choice2 == "p") {
-      p1Wins = false;
-    } else if (rpsChoice == "p" && choice2 == "s") {
-      p1Wins = false;
-    } else if (rpsChoice == "s" && choice2 == "r") {
-      p1Wins = false;
-    }
+    filteredMsgList.forEach(element => {
+      if(element.msg == "r" || element.msg == "rock") numRock++;
+      if(element.msg == "s" || element.msg == "scissor") numScissor++;
+      if(element.msg == "p" || element.msg == "paper") numPaper++;
+    });
 
-    const wordChoice1 =
-      rpsChoice === "r"
-        ? ":rock:"
-        : rpsChoice === "p"
-        ? ":page_facing_up:"
-        : ":scissors:";
-    const wordChoice2 =
-      choice2 === "r"
-        ? ":rock:"
-        : choice2 === "p"
-        ? ":page_facing_up:"
-        : ":scissors:";
+    let winState = "";
+    if(numRock > 0 && numPaper > 0 && numScissor > 0) winState = "draw";
+    else if(numRock == 0 && numPaper == 0) winState = "draw";
+    else if(numScissor == 0 && numRock == 0) winState = "draw";
+    else if(numScissor == 0 && numPaper == 0) winState = "draw";
+    else if(numRock == 0) winState = "Scissor";
+    else if(numPaper == 0) winState = "Rock";
+    else if(numScissor == 0) winState = "Paper";
 
-    if (p1Wins)
-      outputStr += `${rpsQueue} (${wordChoice1}) beats ${message.author} (${wordChoice2})!`;
-    else
-      outputStr += `${message.author} (${wordChoice2}) beats ${rpsQueue} (${wordChoice1})!`;
-    message.channel.send(outputStr);
+    let winString = "";
 
-    message.delete();
-    rpsQueue = "";
-    rpsChoice = "";
-    return;
-  }
+    if(winState==="draw") 
+      winString += "The game is a draw! \n";
+    else if(winState==="Rock")
+      winString += "Rock wins! :rock: \n";
+    else if(winState==="Paper")
+      winString += "Paper wins! :page_facing_up: \n";
+    else if(winState==="Scissor")
+      winString += "Scissor wins! :scissors: \n";
+
+    filteredMsgList.forEach(element => {
+      winString += element.userName;
+      if(element.msg == "r" || element.msg == "rock"){
+        if(winState=="Rock") winString += "(WINNER) ";
+        winString += ":rock:\n";
+      }
+      else if(element.msg == "s" || element.msg == "scissor"){
+        if(winState=="Scissor") winString += "(WINNER) ";
+        winString += ":scissors:\n";
+      }
+      else if(element.msg == "p" || element.msg == "paper"){
+        if(winState=="Paper") winString += "(WINNER) ";
+        winString += ":page_facing_up:\n";
+      }
+    });
+
+    message.channel.send(winString);
+
+    RPScollector = {};
+    filteredMsgList = [];
+  });
+
+  message.channel.send(`Starting a rock-paper-scissors game for ${numPlayers} players! Enter your choice within 20s (r/p/s/rock/paper/scissor) `);
+ }//if starting a new game
 };
 
 module.exports = { handleRPS };

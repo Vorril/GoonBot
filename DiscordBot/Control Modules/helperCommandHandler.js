@@ -2,8 +2,8 @@ const handleHelperCommands = (commandRead, message) => {
   switch (commandRead) {
     case "!commands":
       message.channel.send(
-        `GoonBot know do these: \n !gif <search> \n !roll <dice size> \n !rps <r/p/s> \n !remind(er) <When> <Note> \n !snickers
-         \n Audio: !enter <clip> !beta !amazin !brb !interestin !mexicans !ow !surprise !trash !stfu !chickenwing !no !murder !again !guilty !finish !crossaint !afraid !slutmaker
+        `GoonBot know do these: \n !gif <search> \n !roll <dice size> \n !rps <#players> \n !remind(er) <When> <Note> \n !snickers
+         \n Audio: !enter <clip> !beta !amazin !brb !interestin !mexicans !ow !surprise !trash !stfu !chickenwing !no !murder !again !guilty !finish !crossaint !afraid !slutmaker !yes !triple !simp
          !know \n RPG commands: !busy !current !activity !where !explore !travel <Destination> !stats !fish `// !where !explore"
      
         ); //!startQuest \n !stats");

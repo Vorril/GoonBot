@@ -190,6 +190,24 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
           message.delete();
         }, deleteDelay);
         break;
+        case "!simp":
+        playAudio(message.member.voice.channel, "./Audio/simp.mp3");
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
+        break;
+        case "!yes":
+        playAudio(message.member.voice.channel, "./Audio/yes.mp3");
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
+        break;
+        case "!triple":
+        playAudio(message.member.voice.channel, "./Audio/triple.mp3");
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
+        break;
 
     default:
       return "unfound";
