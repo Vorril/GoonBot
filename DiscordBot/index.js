@@ -79,7 +79,7 @@ function playAudio(voiceChannel, audioFile) {//should refactor but it mentions a
 
 function channelTimeout() {
   //Called on interval
-  if (Date.now() > timeAllowed && currentChannel != "") {
+  if (currentChannel != "" && currentChannel.members.size < 2 && Date.now() > timeAllowed ) {
     currentChannel.leave();
     currentChannel = "";
   }

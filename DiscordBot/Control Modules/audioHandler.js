@@ -28,11 +28,11 @@ const setEntry = (commandModifier, message, playAudio)=>{
 
   //Preparing and saving data
   //Should check that none of this is undefined
-  let settingUser = message.author.tag;
+  let settingUser = message.author.id;
   let userData = {user:settingUser, clip:commandModifier};
 
   let userIndex = entryList.findIndex(function(object){
-    return object.user === userData.user;
+    return object.user == userData.user;
   });
 
   if(userIndex == -1)
@@ -53,7 +53,7 @@ const setEntry = (commandModifier, message, playAudio)=>{
 const handleEntryAudio = (currentChannel, userID, playAudio) =>  {
   //Check if user is in the cache 
   let userIndex = entryList.findIndex(function(object){
-    return object.user === userID;
+    return object.user == userID;
   });
 
   let clipToUse;
