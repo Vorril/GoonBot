@@ -2,16 +2,28 @@
 const fs = require("fs");
 
 let entryList = [];//[{"user":"userTag","clip":"!clip"},{...},{...}...]
+let audioMap = [];//[{command:'!command',fpath:'./Audio/file.mp3'},{...}...]
 
 fs.readFile("./Audio/userEntry.json", function (errLoad, data) {
   if (errLoad) {
-    console.log("Failed to load entry audio settings");
+    console.log("Failed to load entry audio settings json");
   } 
   else {
     entryList = JSON.parse(data); 
   }
   console.log(`Loaded ${entryList.length} entry audio settings`);
-}); //readFile
+}); //readFile audio entry settings
+
+fs.readFile("./Audio/audiomap.json", function(errLoad2, data2){
+  if (errLoad2) {
+    console.log("Failed to load audio file mapping json");
+  } 
+  else {
+     audioMap = JSON.parse(data2);
+      //console.log(audioMap); //still contains \n chars but doesnt sem to be an issue for .parse(), Online sources made it seem like it would be
+    }
+  console.log(`Loaded ${audioMap.length} entry audio settings`);
+});//readFile audio command filename map
 
 
 const setEntry = (commandModifier, message, playAudio)=>{
@@ -62,77 +74,40 @@ const handleEntryAudio = (currentChannel, userID, playAudio) =>  {
   //Create an audio call, nesting channel info in a fake message. Message is generally a more useful parameter contains a lot more info but ehre we dont have actually have one
   let fakeMessage = {member:{voice:{channel:currentChannel}},delete(){}};
 
+  
   handleAudioCommands(clipToUse, "", fakeMessage, playAudio);
 };
 
 const handleAudioCommands = (commandRead, commandModifier, message, playAudio) => {
   let deleteDelay = 350;
  
-  switch (commandRead) {
-    //set personalized audio clips
-    case "!enter":
+  //Check if someone is trying to set their entry
+  if(commandRead == "!enter"){
       setEntry(commandModifier, message, playAudio);
-    break;
+      return;}
 
-    //Clip library
-    case "!beta":
-      playAudio(message.member.voice.channel, "./Audio/beta.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-    case "!amazing":
-    case "!amazin":
-      playAudio(message.member.voice.channel, "./Audio/amazin.wav");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-    case "!brb":
-      playAudio(message.member.voice.channel, "./Audio/brb.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-    case "!interesting":
-      playAudio(message.member.voice.channel, "./Audio/interesting.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-    case "!mexicans":
-      playAudio(message.member.voice.channel, "./Audio/mexicans.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-    case "!ow":
-      playAudio(message.member.voice.channel, "./Audio/ow.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-    case "!surprise":
-      playAudio(message.member.voice.channel, "./Audio/surprise.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-      case "!know":
-        case "!trash":
-        playAudio(message.member.voice.channel, "./Audio/trash.mp3");
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-        break;
-      case "!stfu":
-      playAudio(message.member.voice.channel, "./Audio/stfu.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
+
+  //Search the audiomap loaded from file:
+  let audioIndex = audioMap.findIndex(function(object){
+    return object.command == commandRead;
+  });
+
+  if(audioIndex > -1){
+    playAudio(message.member.voice.channel, audioMap[audioIndex].fpath);
+
+    setTimeout(() => {
+      message.delete();
+    }, deleteDelay);
+
+    return;
+  }
+
+
+  switch (commandRead) {    
+    //Unique clip calls
+   
       case "!chickenwing":
-        if(Math.random()>0.2){
+        if(Math.random()>0.333){
           playAudio(message.member.voice.channel, "./Audio/chickenwing.mp3");}
         else{
           playAudio(message.member.voice.channel, "./Audio/chickenwing2.mp3");}
@@ -141,73 +116,7 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
         message.delete();
       }, deleteDelay);
       break;
-      case "!no":
-      playAudio(message.member.voice.channel, "./Audio/no.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-      case "!guilty":
-      playAudio(message.member.voice.channel, "./Audio/guilty.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-      case "!murder":
-      playAudio(message.member.voice.channel, "./Audio/murder.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-      case "!again":
-      playAudio(message.member.voice.channel, "./Audio/again.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-      case "!blastin":
-      playAudio(message.member.voice.channel, "./Audio/blastin.mp3");
-      setTimeout(() => {
-        message.delete();
-      }, deleteDelay);
-      break;
-      case "!finish":
-      case "!croissant":
-        playAudio(message.member.voice.channel, "./Audio/croissant.mp3");
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-        break;
-        case "!slutmaker":
-        playAudio(message.member.voice.channel, "./Audio/slutmaker.mp3");
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-        break;
-        case "!afraid":
-        playAudio(message.member.voice.channel, "./Audio/afraid.mp3");
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-        break;
-        case "!simp":
-        playAudio(message.member.voice.channel, "./Audio/simp.mp3");
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-        break;
-        case "!yes":
-        playAudio(message.member.voice.channel, "./Audio/yes.mp3");
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-        break;
-        case "!triple":
-        playAudio(message.member.voice.channel, "./Audio/triple.mp3");
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-        break;
+ 
 
     default:
       return "unfound";
