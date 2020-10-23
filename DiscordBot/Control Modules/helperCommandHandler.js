@@ -3,7 +3,7 @@ const handleHelperCommands = (commandRead, message) => {
     case "!commands":
       message.channel.send(
         `GoonBot know do these: \n !gif <search> \n !roll <#> <...> \n !rps <#players> \n !remind(er) <When> <Note> \n !snickers
-         \n !Audio !Audiocommands
+         \n !audio !audiocommands
          !know \n RPG commands: !fish !busy !current !activity !where !explore !travel <Destination> !stats`
      
         ); //!startQuest \n !stats");

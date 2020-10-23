@@ -126,6 +126,8 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
         commandList += (element.command + " ");
       });
 
+      message.channel.send(commandList);
+      break;
 
     default:
       return "unfound";
