@@ -118,6 +118,15 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
       break;
  
 
+    case "!audio":
+    case "!audiocommands":
+      let commandList = "Audio related commands:loud_sound:: \n !enter <clip> \n Clips: \n !chickenwing ";//Need to put anything in the switch statement in here
+
+      audioMap.forEach(element => {
+        commandList += (element.command + " ");
+      });
+
+
     default:
       return "unfound";
       break;
