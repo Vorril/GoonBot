@@ -22,5 +22,11 @@
 {"command":"!trash", "fpath":"./Audio/trash.mp3"},
 {"command":"!know", "fpath":"./Audio/trash.mp3"},
 {"command":"!triple", "fpath":"./Audio/triple.mp3"},
-{"command":"!yes", "fpath":"./Audio/yes.mp3"}
+{"command":"!erect", "fpath":"./Audio/erect.mp3",
+{"command":"!yes", "fpath":"./Audio/yes.mp3",
+{"command":"!kthx", "fpath":"./Audio/kthx.mp3",
+{"command":"!hai", "fpath":"./Audio/hai.mp3",
+{"command":"!why", "fpath":"./Audio/why.mp3",
+{"command":"!what", "fpath":"./Audio/what.mp3",
+{"command":"!grocery", "fpath":"./Audio/grocery.mp3"}
 ]
