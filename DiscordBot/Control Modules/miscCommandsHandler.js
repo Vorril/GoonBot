@@ -75,7 +75,9 @@ function isTimeUnit(parseString){
   
 }
 //Todo timestamps and reload permanence/ saving reminderto file etc
-function reminder(message, what, when = 3600000){
+function reminder(message, what){
+  let when = 3600000;
+
   let messageParse = what.split(" ");
   if(messageParse.length == 1){// no time info given
     let reminderTimer = setTimeout(function(){message.author.send(what);}, when);// Should work for multiple people at once?
@@ -196,4 +198,4 @@ function reminder(message, what, when = 3600000){
 //`);
 };
 
-module.exports = { handleMiscCommands };
+module.exports = { handleMiscCommands, reminder };

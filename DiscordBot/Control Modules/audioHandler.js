@@ -1,8 +1,8 @@
 
 const fs = require("fs");
 
-let entryList = [];//[{"user":"userTag","clip":"!clip"},{...},{...}...]
-let audioMap = [];//[{command:'!command',fpath:'./Audio/file.mp3'},{...}...]
+let entryList = [];//[{"user":"userID","clip":"!clip"},{...},{...}...]
+let audioMap = [];//[{command:'"!command","fpath":"./Audio/file.mp3"},{...}...]
 
 fs.readFile("./Audio/userEntry.json", function (errLoad, data) {
   if (errLoad) {
@@ -12,7 +12,7 @@ fs.readFile("./Audio/userEntry.json", function (errLoad, data) {
     entryList = JSON.parse(data); 
   }
   console.log(`Loaded ${entryList.length} entry audio settings`);
-}); //readFile audio entry settings
+}); //readFile audio unique user entry settings
 
 fs.readFile("./Audio/audiomap.json", function(errLoad2, data2){
   if (errLoad2) {
@@ -25,7 +25,7 @@ fs.readFile("./Audio/audiomap.json", function(errLoad2, data2){
   console.log(`Loaded ${audioMap.length} entry audio settings`);
 });//readFile audio command filename map
 
-
+//Set user's audio clip on channel enter, plays it, saves it
 const setEntry = (commandModifier, message, playAudio)=>{
   //Cleanup/check input
   if(!commandModifier.startsWith("!")){
@@ -62,6 +62,7 @@ const setEntry = (commandModifier, message, playAudio)=>{
   return "updated";
 }
 
+//Called by channel entry listener in index.js
 const handleEntryAudio = (currentChannel, userID, playAudio) =>  {
   //Check if user is in the cache 
   let userIndex = entryList.findIndex(function(object){
@@ -78,6 +79,7 @@ const handleEntryAudio = (currentChannel, userID, playAudio) =>  {
   handleAudioCommands(clipToUse, "", fakeMessage, playAudio);
 };
 
+//Checking through ! commands
 const handleAudioCommands = (commandRead, commandModifier, message, playAudio) => {
   let deleteDelay = 350;
  
@@ -99,12 +101,12 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
       message.delete();
     }, deleteDelay);
 
-    return;
+    return;//audio was found and played
   }
 
 
   switch (commandRead) {    
-    //Unique clip calls
+    //Unique clip calls or misc audioHandler commands
    
       case "!chickenwing":
         if(Math.random()>0.333){

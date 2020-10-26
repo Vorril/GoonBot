@@ -97,7 +97,7 @@ client.on("ready", function () {
 
 //Called on channel change, mute, or deafen, but I think not on user name changes
 client.on("voiceStateUpdate", (oldUserState, newUserState) => {
-  if (newUserState.id == 742609957148557374) return; //ignore the bot itself
+  if (newUserState.id == 742609957148557374) return; //ignore the bot itself //Should double check this value on startup not ure if it's immutable
   //console.log(oldUserState.channelID);
   //console.log(newUserState);
 
@@ -107,19 +107,8 @@ client.on("voiceStateUpdate", (oldUserState, newUserState) => {
     newUserState.channelID == currentChannel.id
   ) {
 
-    //let userTag;
-     
-    //let cachedUser = client.users.fetch(newUserState.id);
-    //console.log(cachedUser);
-     //cachedUser.then(function(promisedUser){//Honestly could just use ID rather than get the tag
-       //console.log(promisedUser);
-      //userTag = promisedUser.username+"#"+promisedUser.discriminator;
-      //console.log(userTag);
-    //});
-
-    if (isReady)
+    if (isReady)//Play personalized entry clip
       setTimeout(() => {
-       // playAudio(currentChannel, "./Audio/beta.mp3");
        handleEntryAudio(currentChannel, newUserState.id, playAudio);
       }, 350);
   }
@@ -131,24 +120,23 @@ client.on("message", (message) => {
    */
   if (
     !message.content.startsWith(prefix) ||
-    message.author.tag == "GoonBot#3603"
+    message.author.tag == "GoonBot#3603"//todo more robust check
   )
     return;
 
     if(typeof(message.channel) == "DMChannel"){//message was DMd to goobot
-      
+      //handleDM()
 
       return;
     }
 
-  // !commandRead <commandModifier> //careful to check if no mods given
-
-  //Todo See if anything misbehaves on untrimmed input
+  //Typical syntax: !commandRead commandModifier
+  //Check if modifier was given and split the two:
   var commandLength = message.content.indexOf(" "); //-1 if unfound
   var commandRead = message.content.substring(
     0,
     commandLength == -1 ? message.content.length : commandLength
-  ); //Whether var is found
+  ); 
 
   var commandModifier =
     commandLength == -1
@@ -161,6 +149,7 @@ client.on("message", (message) => {
   if (commandRead == "!gif" && commandModifier == "") {
     /**
      * If search query IS NOT provided, generate a random gif
+     * todo: setup a random dictionary to use
      */
     const randomGif = handleGifsRandom(message);
   } else if (commandRead == "!gif") {
@@ -172,10 +161,10 @@ client.on("message", (message) => {
     /***************************************
      ********     HANDLE ROLLS     *********
      ***************************************/
-
-    const rollOutput = handleDiceRoll(commandModifier, message.author, message);
+    const rollOutput = handleDiceRoll(commandModifier, message.author, message);//todo inconsistent messaging syntax
     message.channel.send(rollOutput);
     return;
+    
   } else if (commandRead == "!rps") {
     /***************************************
      *****  HANDLE ROCK PAPER SCISSOR  *****
@@ -215,5 +204,9 @@ client.on("message", (message) => {
     }
   }
 }); //on message
+
+/*
+ * Client login
+ */
 
 client.login(token);
