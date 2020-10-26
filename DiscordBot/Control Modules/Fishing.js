@@ -13,6 +13,38 @@ class FishingDataChunk{
     fishingXP = 0; 
     fishCaught = 0;
     activityTimeout = "";
+
+
+//Periodically attempts to catch a fish
+//By making this a class function nothing jenky happens when multiple poeple try to fish at once
+//I think assigning multiple interval timers to once function didnt work? Maybe 
+ fishLoop(message, mainPlayer, fishingPlayer){
+    //    fishLoop = (message)=>{
+         if(Math.random() > 0.8){//catch success
+             //TODO inventory
+             let caughtFish = catchFish(fishingPlayer.fishingLvl);
+             message.channel.send(`${mainPlayer.playerUsername} caught a fish! A ${caughtFish.type} :fishing_pole_and_fish: +${caughtFish.xp}XP`);
+            
+            //Cleanup action tracking
+             clearInterval(fishingPlayer.activityTimeout);
+             fishingPlayer.activityTimeout = "";
+             mainPlayer.currentAction = "None";
+ 
+             //XP and leveling
+             fishingPlayer.fishCaught++;
+             fishingPlayer.fishingXP += caughtFish.xp;
+ 
+             if(fishingPlayer.fishingXP >= (fishingPlayer.fishingLvl*100)){
+                fishingPlayer.fishingXP -= fishingPlayer.fishingLvl*100;
+                fishingPlayer.fishingLvl++;
+                 message.channel.send(`${mainPlayer.playerUsername} has leveled up! Fishing level ${fishingPlayer.fishingLvl}! :fireworks: :shark:`);
+             }
+ 
+             saveFishingData();//Only an attempt may not if others are simultaneously fishing
+         }
+     }
+
+
 }
 
 let playerFishingData = [];
@@ -33,11 +65,15 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
 
   function saveFishingData(){
     //Can only safely save once the last person has finished fishing ie no one is currently fishing
+   let busy = false;
+   
     playerFishingData.forEach(element => {
         if(element.activityTimeout != ""){
-            return "busy";
+            busy = true;
         }
     });
+
+    if(busy) return;
 
     fs.writeFile("./Save Files/playerFishingData.json", JSON.stringify(playerFishingData),
      function (err) {}) 
@@ -73,7 +109,7 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
        let fishingPlayer = getPlayerFishingData(mainPlayer.playerID);
 
        //As elsewhere probably should just pass channel instead of message here!
-       fishingPlayer.activityTimeout = setInterval(function(){fishLoop(message, mainPlayer, fishingPlayer)}, 5000);//this way multiple people can do it as its an object function...
+       fishingPlayer.activityTimeout = setInterval(function(){fishingPlayer.fishLoop(message, mainPlayer, fishingPlayer)}, 5000);//this way multiple people can do it as its an object function...
        mainPlayer.currentAction = "Fishing";
 
        message.channel.send(`${mainPlayer.playerUsername} started fishing...`);
@@ -109,31 +145,6 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
 
 };//catchfish()
 
-//Periodically attempts to catch a fish
-    function fishLoop(message, mainPlayer, fishingPlayer){
-    //    fishLoop = (message)=>{
-         if(Math.random() > 0.8){//catch success
-             //TODO inventory
-             let caughtFish = catchFish(fishingPlayer.fishingLvl);
-             message.channel.send(`${mainPlayer.playerUsername} caught a fish! A ${caughtFish.type} :fishing_pole_and_fish: +${caughtFish.xp}XP`);
-            
-            //Cleanup action tracking
-             clearInterval(fishingPlayer.activityTimeout);
-             fishingPlayer.activityTimeout = "";
-             mainPlayer.currentAction = "None";
- 
-             //XP and leveling
-             fishingPlayer.fishCaught++;
-             fishingPlayer.fishingXP += caughtFish.xp;
- 
-             if(fishingPlayer.fishingXP >= (fishingPlayer.fishingLvl*100)){
-                fishingPlayer.fishingXP -= fishingPlayer.fishingLvl*100;
-                fishingPlayer.fishingLvl++;
-                 message.channel.send(`${mainPlayer.playerUsername} has leveled up! Fishing level ${fishingPlayer.fishingLvl}! :fireworks: :shark:`);
-             }
- 
-             saveFishingData();//Only an attempt may not if others are simultaneously fishing
-         }
-     }
+
 
 module.exports = {start};// add getStats 
