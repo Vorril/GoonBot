@@ -6,6 +6,7 @@
 {"command":"!blastin", "fpath":"./Audio/blastin.mp3"},
 {"command":"!brb", "fpath":"./Audio/brb.mp3"},
 {"command":"!chickenwingkid", "fpath":"./Audio/chickenwing2.mp3"},
+{"command":"!countdown", "fpath":"./Audio/countdown.mp3"},
 {"command":"!croissant", "fpath":"./Audio/croissant.mp3"},
 {"command":"!finish", "fpath":"./Audio/croissant.mp3"},
 {"command":"!guilty", "fpath":"./Audio/guilty.mp3"},
@@ -28,5 +29,13 @@
 {"command":"!hai", "fpath":"./Audio/hai.mp3"},
 {"command":"!why", "fpath":"./Audio/why.mp3"},
 {"command":"!what", "fpath":"./Audio/what.mp3"},
-{"command":"!grocery", "fpath":"./Audio/grocery.mp3"}
+{"command":"!grocery", "fpath":"./Audio/grocery.mp3"},
+{"command":"!nani", "fpath":"./Audio/nani.mp3"},
+{"command":"!oyoy", "fpath":"./Audio/doodlebob.mp3"},
+{"command":"!freddy", "fpath":"./Audio/freddy.mp3"},
+{"command":"!friday", "fpath":"./Audio/friday.mp3"},
+{"command":"!ragtime", "fpath":"./Audio/ragtime.mp3"},
+{"command":"!confidence", "fpath":"./Audio/confidence.mp3"},
+{"command":"!total", "fpath":"./Audio/total.mp3"},
+{"command":"!bitch", "fpath":"./Audio/bitch.mp3"}
 ]

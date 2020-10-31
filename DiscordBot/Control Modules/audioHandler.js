@@ -119,6 +119,18 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
       }, deleteDelay);
       break;
  
+      case "!stranger":
+        let rand = Math.random();
+        if(rand < 0.3333){
+          playAudio(message.member.voice.channel, "./Audio/st1.mp3");
+        }
+        else if(rand > 0.6667){
+          playAudio(message.member.voice.channel, "./Audio/st2.mp3");
+        }
+        else{
+          playAudio(message.member.voice.channel, "./Audio/st3.mp3");
+        }
+      break;
 
     case "!audio":
     case "!audiocommands":

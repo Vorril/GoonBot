@@ -127,7 +127,7 @@ client.on("message", (message) => {
     if(typeof(message.channel) == "DMChannel"){//message was DMd to goobot
       //handleDM()
 
-      return;
+      return;// Potential to cause problems if not done... should actually check DM, vs voice, vs text
     }
 
   //Typical syntax: !commandRead commandModifier

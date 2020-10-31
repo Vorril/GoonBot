@@ -7,7 +7,7 @@ const Player = require("../player");
 const fs = require("fs");
 
 // Player Variables
-let playerList = [];
+const playerList = []; //Consider using on object not an array...
 
  /***************************************
   *********    STARTUP LOAD     *********
@@ -37,15 +37,19 @@ const savePlayers = () => {
   
   fs.writeFile("./Save Files/playerData.json", JSON.stringify(playerList), function (
     err
-  ) {}) //TODO Fails if a member in the player class is a class(timeout from intervals causing but need to olve for inventory at some point)
+  ) {})
 
 };
 
 
+ /***************************************
+  *********  Static Functions   *********
+  ***************************************/
+
   //returns player or creates new and returns it
 const checkForPlayer = (checkUser) => {//checking via the discord user obj incase we need to add a new player we will need access to all that info
   for (i = 0; i < playerList.length; i++) {
-    if (playerList[i].playerID == checkUser.id) return playerList[i];
+    if (playerList[i].playerID === checkUser.id) return playerList[i];
   }//found
 
   //Unfound, add new
@@ -54,7 +58,7 @@ const checkForPlayer = (checkUser) => {//checking via the discord user obj incas
   playerList.push(new Player(playerToAdd));
   console.log(
     `New player added ${playerToAdd.id}, ${playerToAdd.username} playerList Index: ${playerList.length - 1}`
-  );
+  );//not logging corectly says undefined
 
     savePlayers();
 
@@ -71,8 +75,7 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
     case "!fish":
       player = checkForPlayer(message.author);
       player.fish(message);//Could just pass channel or channel + commandModifier?
-      
-      
+            
       break;
 
     case "!hydrate":

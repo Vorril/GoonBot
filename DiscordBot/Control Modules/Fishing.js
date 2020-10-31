@@ -15,44 +15,15 @@ class FishingDataChunk{
     activityTimeout = "";
 
 
-//Periodically attempts to catch a fish
-//By making this a class function nothing jenky happens when multiple poeple try to fish at once
-//I think assigning multiple interval timers to once function didnt work? Maybe 
- fishLoop(message, mainPlayer, fishingPlayer){
-    //    fishLoop = (message)=>{
-         if(Math.random() > 0.8){//catch success
-             //TODO inventory
-             let caughtFish = catchFish(fishingPlayer.fishingLvl);
-             message.channel.send(`${mainPlayer.playerUsername} caught a fish! A ${caughtFish.type} :fishing_pole_and_fish: +${caughtFish.xp}XP`);
-            
-            //Cleanup action tracking
-             clearInterval(fishingPlayer.activityTimeout);
-             fishingPlayer.activityTimeout = "";
-             mainPlayer.currentAction = "None";
- 
-             //XP and leveling
-             fishingPlayer.fishCaught++;
-             fishingPlayer.fishingXP += caughtFish.xp;
- 
-             if(fishingPlayer.fishingXP >= (fishingPlayer.fishingLvl*100)){
-                fishingPlayer.fishingXP -= fishingPlayer.fishingLvl*100;
-                fishingPlayer.fishingLvl++;
-                 message.channel.send(`${mainPlayer.playerUsername} has leveled up! Fishing level ${fishingPlayer.fishingLvl}! :fireworks: :shark:`);
-             }
- 
-             saveFishingData();//Only an attempt may not if others are simultaneously fishing
-         }
-     }
+}//class
 
-
-}
-
-let playerFishingData = [];
+const playerFishingData = [];
 
    
 //STARUP LOAD:
 fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
     if (errLoad) {
+        console.log(`Fishingdata failed to load`);
     } else {
       let loadList = JSON.parse(data); //data = stringify array
       loadList.forEach((element) => {
@@ -78,8 +49,8 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
     fs.writeFile("./Save Files/playerFishingData.json", JSON.stringify(playerFishingData),
      function (err) {}) 
    
-     return "saved";
-  }
+     return;
+  }//savedata
 
   const getPlayerFishingData = (checkID) => {
     for (i = 0; i < playerFishingData.length; i++) {
@@ -101,7 +72,7 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
 ***** FISHING FUNCTIONS *****
 */// ************************
 
-   function start(message, mainPlayer){
+   const start = (message, mainPlayer) => {
        //playerMain is the base Player class object
        //Fishing data is sort of like an extension of the player class but handled and saved here
        //and kept track of in parrallel using the playerID
@@ -109,13 +80,43 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
        let fishingPlayer = getPlayerFishingData(mainPlayer.playerID);
 
        //As elsewhere probably should just pass channel instead of message here!
-       fishingPlayer.activityTimeout = setInterval(function(){fishingPlayer.fishLoop(message, mainPlayer, fishingPlayer)}, 5000);//this way multiple people can do it as its an object function...
+       fishingPlayer.activityTimeout = setInterval(function(){fishingPlayer.fishLoop(message, mainPlayer, fishingPlayer)}, 5000);//wrapping the interval function in an anonymous function//possibly the source of race condition?
        mainPlayer.currentAction = "Fishing";
 
        message.channel.send(`${mainPlayer.playerUsername} started fishing...`);
 
        return;
-   }
+   }//start fishing
+
+
+
+//Periodically attempts to catch a fish
+ const fishLoop = (message, mainPlayer, fishingPlayer) => {
+   
+         if(Math.random() > 0.8){//catch success
+             //TODO inventory
+             let caughtFish = catchFish(fishingPlayer.fishingLvl);
+             message.channel.send(`${mainPlayer.playerUsername} caught a fish! A ${caughtFish.type} :fishing_pole_and_fish: +${caughtFish.xp}XP`);
+            
+            //Cleanup action tracking
+             clearInterval(fishingPlayer.activityTimeout);
+             fishingPlayer.activityTimeout = "";
+             mainPlayer.currentAction = "None";
+ 
+             //XP and leveling
+             fishingPlayer.fishCaught++;
+             fishingPlayer.fishingXP += caughtFish.xp;
+ 
+             if(fishingPlayer.fishingXP >= (fishingPlayer.fishingLvl*100)){
+                fishingPlayer.fishingXP -= fishingPlayer.fishingLvl*100;
+                fishingPlayer.fishingLvl++;
+                 message.channel.send(`${mainPlayer.playerUsername} has leveled up! Fishing level ${fishingPlayer.fishingLvl}! :fireworks: :shark:`);
+             }
+ 
+             saveFishingData();//Only an attempt may not if others are simultaneously fishing
+         }
+     }//fish loop
+
    
    //Returns a fish based on players level
    function catchFish(level, location = ""){

@@ -37,7 +37,7 @@ class Player{
     }
 
     save(){
-        savePlayers();//throwback to main handler
+        savePlayers();//throwback to main handler//should probly be static func
     }
 }//Player
 
