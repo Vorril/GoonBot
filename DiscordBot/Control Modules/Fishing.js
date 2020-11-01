@@ -78,9 +78,11 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
        //and kept track of in parrallel using the playerID
 
        let fishingPlayer = getPlayerFishingData(mainPlayer.playerID);
+       let timeCatch = (Math.random() * 1000 * 30) + 5000;//5 - 35s evenly distributed
 
        //As elsewhere probably should just pass channel instead of message here!
-       fishingPlayer.activityTimeout = setInterval(function(){fishingPlayer.fishLoop(message, mainPlayer, fishingPlayer)}, 5000);//wrapping the interval function in an anonymous function//possibly the source of race condition?
+       //Also, could just say screw it to tracking the timeout
+       fishingPlayer.activityTimeout = setTimeout(function(){catchFish(message, mainPlayer, fishingPlayer)}, timeCatch);//
        mainPlayer.currentAction = "Fishing";
 
        message.channel.send(`${mainPlayer.playerUsername} started fishing...`);
@@ -91,35 +93,32 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
 
 
 //Periodically attempts to catch a fish
- const fishLoop = (message, mainPlayer, fishingPlayer) => {
-   
-         if(Math.random() > 0.8){//catch success
-             //TODO inventory
-             let caughtFish = catchFish(fishingPlayer.fishingLvl);
-             message.channel.send(`${mainPlayer.playerUsername} caught a fish! A ${caughtFish.type} :fishing_pole_and_fish: +${caughtFish.xp}XP`);
+ const catchFish = (message, mainPlayer, fishingPlayer) => {
+        //TODO inventory
+        let caughtFish = getFish(fishingPlayer.fishingLvl);
+        message.channel.send(`${mainPlayer.playerUsername} caught a fish! A ${caughtFish.type} :fishing_pole_and_fish: +${caughtFish.xp}XP`);
             
-            //Cleanup action tracking
-             clearInterval(fishingPlayer.activityTimeout);
-             fishingPlayer.activityTimeout = "";
-             mainPlayer.currentAction = "None";
+        //Cleanup action tracking
+        fishingPlayer.activityTimeout = "";
+        mainPlayer.currentAction = "None";
+
+        //XP and leveling
+        fishingPlayer.fishCaught++;
+        fishingPlayer.fishingXP += caughtFish.xp;
  
-             //XP and leveling
-             fishingPlayer.fishCaught++;
-             fishingPlayer.fishingXP += caughtFish.xp;
- 
-             if(fishingPlayer.fishingXP >= (fishingPlayer.fishingLvl*100)){
-                fishingPlayer.fishingXP -= fishingPlayer.fishingLvl*100;
-                fishingPlayer.fishingLvl++;
-                 message.channel.send(`${mainPlayer.playerUsername} has leveled up! Fishing level ${fishingPlayer.fishingLvl}! :fireworks: :shark:`);
-             }
+        if(fishingPlayer.fishingXP >= (fishingPlayer.fishingLvl*100)){
+            fishingPlayer.fishingXP -= fishingPlayer.fishingLvl*100;
+            fishingPlayer.fishingLvl++;
+            message.channel.send(`${mainPlayer.playerUsername} has leveled up! Fishing level ${fishingPlayer.fishingLvl}! :fireworks: :shark:`);
+        }
  
              saveFishingData();//Only an attempt may not if others are simultaneously fishing
-         }
+         
      }//fish loop
 
    
    //Returns a fish based on players level
-   function catchFish(level, location = ""){
+   function getFish(level, location = ""){
     let fish = {};
     let catchPower = level*100 * Math.random();//From 1 to 100*level
 

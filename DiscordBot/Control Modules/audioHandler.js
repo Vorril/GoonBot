@@ -130,6 +130,10 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
         else{
           playAudio(message.member.voice.channel, "./Audio/st3.mp3");
         }
+
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
       break;
 
     case "!audio":
