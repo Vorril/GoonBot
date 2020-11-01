@@ -55,7 +55,7 @@ const setEntry = (commandModifier, message, playAudio)=>{
 
   let entryListJSON = JSON.stringify(entryList);
   console.log(entryListJSON);
-  fs.writeFile("./Audio/userEntry.json", entryListJSON, 
+  fs.writeFile("./Audio/UserEntry.json", entryListJSON, 
     function (err) {}//{console.log("Failed to save audio entry data")} //Always throws err but works?
   );
 
