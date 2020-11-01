@@ -1,4 +1,6 @@
 config.json
 node_modules/
 ./Audio/userEntry.json
+./Audio/UserEntry.json
+/Audio/UserEntry.json
 playerData.json

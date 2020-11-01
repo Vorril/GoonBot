@@ -4,7 +4,7 @@ const fs = require("fs");
 let entryList = [];//[{"user":"userID","clip":"!clip"},{...},{...}...]
 let audioMap = [];//[{command:'"!command","fpath":"./Audio/file.mp3"},{...}...]
 
-fs.readFile("./Audio/userEntry.json", function (errLoad, data) {
+fs.readFile("./Audio/UserEntry.json", function (errLoad, data) {
   if (errLoad) {
     console.log("Failed to load entry audio settings json");
   } 
@@ -86,7 +86,8 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
   //Check if someone is trying to set their entry
   if(commandRead == "!enter"){
       setEntry(commandModifier, message, playAudio);
-      return;}
+      return;
+    }
 
 
   //Search the audiomap loaded from file:
