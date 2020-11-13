@@ -4,3 +4,7 @@ node_modules/
 ./Audio/UserEntry.json
 /Audio/UserEntry.json
 playerData.json
+./Save Files/playerData.json
+./Save Files/playerWoodcuttingData.json
+/Save Files/playerData.json
+/Save Files/playerWoodcuttingData.json
