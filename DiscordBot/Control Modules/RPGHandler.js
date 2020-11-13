@@ -58,7 +58,7 @@ const checkForPlayer = (checkUser) => {//checking via the discord user obj incas
   playerList.push(new Player(playerToAdd));
   console.log(
     `New player added ${playerToAdd.id}, ${playerToAdd.username} playerList Index: ${playerList.length - 1}`
-  );//not logging corectly says undefined
+  );//not logging corectly says undefined?
 
     savePlayers();
 
@@ -84,6 +84,24 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
       savePlayers();
       
       break;
+    
+    case "!chop":
+      player = checkForPlayer(message.author);
+      player.chop(message);
+
+      break;
+
+    case "!inv":
+    case "!inventory":
+      player = checkForPlayer(message.author);
+      player.printInventory(message);
+
+    break;
+
+    case "!stats":
+      player = checkForPlayer(message.author);
+      player.printStats(message);
+    break;
     
     default:
       return "unfound";

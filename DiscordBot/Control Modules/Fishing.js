@@ -145,6 +145,9 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
 
 };//catchfish()
 
+function getStats(mainPlayer){
+    let fishingPlayer = getPlayerFishingData(mainPlayer.playerID);
+    return `Fishing lvl: ${fishingPlayer.fishingLvl} XP: ${fishingPlayer.fishingXP} \n`;
+}
 
-
-module.exports = {start};// add getStats 
+module.exports = {start, getStats};// add getStats 
