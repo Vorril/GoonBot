@@ -160,6 +160,9 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
       let today = new Date();
       let daycode = today.getDay();
       let hourcode = today.getHours();
+
+      if(hourcode < 8) daycode = daycode-1;//Code seems to be fixed to GMT::00
+      
       if(daycode == 5){
         playAudio(message.member.voice.channel, "./Audio/friday.mp3");}
       else
