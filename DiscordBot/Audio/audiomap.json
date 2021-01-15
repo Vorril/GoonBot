@@ -32,7 +32,6 @@
 {"command":"!nani", "fpath":"./Audio/nani.mp3"},
 {"command":"!oyoy", "fpath":"./Audio/doodlebob.mp3"},
 {"command":"!freddy", "fpath":"./Audio/freddy.mp3"},
-{"command":"!friday", "fpath":"./Audio/friday.mp3"},
 {"command":"!ragtime", "fpath":"./Audio/ragtime.mp3"},
 {"command":"!confidence", "fpath":"./Audio/confidence.mp3"},
 {"command":"!total", "fpath":"./Audio/total.mp3"},

@@ -30,7 +30,7 @@ const {
 
 const { handleRPGCommands } = require("./Control Modules/RPGHandler.js");
 
-const { handleAudioCommands, handleEntryAudio } = require("./Control Modules/audioHandler.js");
+const { handleAudioCommands, handleEntryAudio, submitAudio } = require("./Control Modules/audioHandler.js");
 
 //Bot variables:
 var isReady = false;
@@ -125,7 +125,14 @@ client.on("message", (message) => {
     return;
 
     if(typeof(message.channel) == "DMChannel"){//message was DMd to goobot
-      //handleDM()
+      //handleDM() should probably refactor this...
+      if(message.attachments.first()){//Messageattachments is a map of messageattachment obects check api
+        if(message.attachments.first().name.endsWith(".mp3")){
+          if(message.attachments.first().size < 300000){//300kb max
+            //submitAudio(message);
+          }
+        }
+      }
 
       return;// Potential to cause problems if not done... should actually check DM, vs voice, vs text
     }

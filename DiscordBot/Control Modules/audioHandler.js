@@ -1,8 +1,10 @@
 
 const fs = require("fs");
+const request = require("request");
 
 let entryList = [];//[{"user":"userID","clip":"!clip"},{...},{...}...]
 let audioMap = [];//[{command:'"!command","fpath":"./Audio/file.mp3"},{...}...]
+let submittedAudioMap = [];//User submitted mp3s, less curated, keeping segregated
 
 fs.readFile("./Audio/UserEntry.json", function (errLoad, data) {
   if (errLoad) {
@@ -24,6 +26,19 @@ fs.readFile("./Audio/audiomap.json", function(errLoad2, data2){
     }
   console.log(`Loaded ${audioMap.length} entry audio settings`);
 });//readFile audio command filename map
+
+fs.readFile("./Audio/Submitted/submittedAudio.json", function(errLoad2, data2){
+  if (errLoad2) {
+    console.log("Failed to load submitted audio file mapping json");
+  } 
+  else {
+     submittedAudioMap = JSON.parse(data2);
+      //console.log(audioMap); //still contains \n chars but doesnt sem to be an issue for .parse(), Online sources made it seem like it would be
+    }
+  console.log(`Loaded ${submittedAudioMap.length} submitted audio clips`);
+});//readFile audio command filename map
+
+
 
 //Set user's audio clip on channel enter, plays it, saves it
 const setEntry = (commandModifier, message, playAudio)=>{
@@ -94,6 +109,11 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
   let audioIndex = audioMap.findIndex(function(object){
     return object.command == commandRead;
   });
+  //Check submitted index:
+  if(audioIndex < 0) audioIndex = submittedAudioMap.findIndex(function(object){
+    return object.command == commandRead;
+  });
+
 
   if(audioIndex > -1){
     playAudio(message.member.voice.channel, audioMap[audioIndex].fpath);
@@ -137,9 +157,20 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
         }, deleteDelay);
       break;
 
+    case "!friday":
+      let today = new Date();
+      let daycode = today.getDay();
+      if(daycode == 5)
+        playAudio(message.member.voice.channel, "./Audio/friday.mp3");
+      else
+        playAudio(message.member.voice.channel, "./Audio/notfriday.wav");
+
+      //console.log(daycode);
+      break;
+
     case "!audio":
     case "!audiocommands":
-      let commandList = "Audio related commands:loud_sound:: \n !enter <clip> \n Clips: \n !chickenwing ";//Need to put anything in the switch statement in here
+      let commandList = "Audio related commands:loud_sound:: \n !enter <clip> \n Clips: \n !chickenwing !stranger !friday";//Need to put anything in the switch statement in here
 
       audioMap.forEach(element => {
         commandList += (element.command + " ");
@@ -154,4 +185,36 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
   }
 };
 
-module.exports = { handleAudioCommands, handleEntryAudio };
+const submitAudio = (message) => {
+  let clipAttached = message.attachments.first();
+  let clipName = clipAttached.name.substring(0,clipAttached.name.lastIndexOf(".mp3"));
+  let clipFilename = clipName + ".mp3";
+
+  //check both maps to see if command already in use, wont check non audio commands though so kind of sketchy
+  let audioIndex = audioMap.findIndex(function(object){
+    return object.command == clipName;
+  });
+
+  if(audioIndex < 0) audioIndex = submittedAudioMap.findIndex(function(object){
+    return object.command == clipName;
+  });
+
+
+  //download:
+  request.get(clipAttached.url)
+    .on("error",console.log("URL get error"))
+    .pipe(fs.createWriteStream("./Audio/Submitted/"+clipFilename));
+
+  let commandObj;
+  commandObj.command = "!"+clipName;
+  commandObj.fpath = "./Audio/Submitted/"+clipFilename;
+
+  submittedAudioMap.push(commandObj);
+
+  //Save:
+  fs.writeFile("./Audio/Submitted/submittedAudio.json", JSON.stringify(submittedAudioMap), function (
+    err
+  ) {console.log("Failed to save submitted during audiomap filesync")})
+}
+
+module.exports = { handleAudioCommands, handleEntryAudio, submitAudio };
