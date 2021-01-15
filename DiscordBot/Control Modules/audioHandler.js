@@ -1,6 +1,5 @@
 
 const fs = require("fs");
-const request = require("request");
 
 let entryList = [];//[{"user":"userID","clip":"!clip"},{...},{...}...]
 let audioMap = [];//[{command:'"!command","fpath":"./Audio/file.mp3"},{...}...]
