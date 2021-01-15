@@ -159,12 +159,12 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
     case "!friday":
       let today = new Date();
       let daycode = today.getDay();
-      if(daycode == 5)
-        playAudio(message.member.voice.channel, "./Audio/friday.mp3");
+      if(daycode == 5){
+        playAudio(message.member.voice.channel, "./Audio/friday.mp3");}
       else
         playAudio(message.member.voice.channel, "./Audio/notfriday.wav");
 
-      //console.log(daycode);
+      console.log(daycode);
       break;
 
     case "!audio":
