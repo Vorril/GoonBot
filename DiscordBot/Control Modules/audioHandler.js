@@ -156,19 +156,47 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
         }, deleteDelay);
       break;
 
+      case "!later":
+        let rand2 = Math.random();
+        if(rand2 < 0.2){
+          playAudio(message.member.voice.channel, "./Audio/eternitylater.wav");
+        }
+        else if(rand2 < 0.4){
+          playAudio(message.member.voice.channel, "./Audio/sixlater.wav");
+        }
+        else if(rand2 < 0.6){
+          playAudio(message.member.voice.channel, "./Audio/momentslater.wav");
+        }
+        else if(rand2 < 0.8){
+          playAudio(message.member.voice.channel, "./Audio/threelater.wav");
+        }
+        else{
+          playAudio(message.member.voice.channel, "./Audio/twentylater.wav");
+        }
+
+
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
+      break;
+
     case "!friday":
       let today = new Date();
       let daycode = today.getDay();
       let hourcode = today.getHours();
 
       if(hourcode < 8) daycode = daycode-1;//Code seems to be fixed to GMT::00
-      
+
       if(daycode == 5){
         playAudio(message.member.voice.channel, "./Audio/friday.mp3");}
       else
         playAudio(message.member.voice.channel, "./Audio/notfriday.wav");
 
       console.log(daycode+':'+hourcode);
+
+      setTimeout(() => {
+        message.delete();
+      }, deleteDelay);
       break;
 
     case "!audio":
