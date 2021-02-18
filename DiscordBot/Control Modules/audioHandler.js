@@ -156,6 +156,29 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
         }, deleteDelay);
       break;
 
+      case "!bwonsamdi":
+        let rand3 = Math.random();
+        if(rand3 < 0.2){
+          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/badloa.wav");
+        }
+        else if(rand3 < 0.4){
+          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/died.wav");
+        }
+        else if(rand3 < 0.6){
+          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/mistaken.wav");
+        }
+        else if(rand3 < 0.8){
+          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/romance.wav");
+        }
+        else{
+          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/truelove.wav");
+        }
+
+        setTimeout(() => {
+          message.delete();
+        }, deleteDelay);
+      break;
+
       case "!later":
         let rand2 = Math.random();
         if(rand2 < 0.2){
