@@ -32,6 +32,8 @@ const { handleRPGCommands } = require("./Control Modules/RPGHandler.js");
 
 const { handleAudioCommands, handleEntryAudio, submitAudio } = require("./Control Modules/audioHandler.js");
 
+const { handleStockCommands } = require("./Control Modules/StockHandler.js");
+
 //Bot variables:
 var isReady = false;
 var currentChannel = "";
@@ -198,7 +200,13 @@ client.on("message", (message) => {
      ***************************************/
     let audioRes = handleAudioCommands(commandRead, commandModifier, message, playAudio);
 
-    const resArr = [helperRes, rpgRes, miscRes, audioRes];
+    /***************************************
+     *****   HANDLE Stock COMMANDS     *****
+     ***************************************/
+    let stockRes = handleStockCommands(commandRead, commandModifier, message);
+
+
+    const resArr = [helperRes, rpgRes, miscRes, audioRes, stockRes];
 
     let allAreInvalid = true;
     resArr.forEach((res) => {
