@@ -72,7 +72,7 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
   switch (commandRead) {
     case "!forcesave":
       player = checkForPlayer(message.author);
-      if(player.username== 'Vorril#2467'){
+      if(player.username == 'Vorril'){
         console.log('Vorril forcesave');
         for (i = 0; i < playerList.length; i++) {
           playerList[i].stopAll();
@@ -124,18 +124,24 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
         let stats = playerList[i].getLvls();
         
         if(stats.Woodcutting > wcLvl1){
+          wcLvl2 = wcLvl1;
+          wcLvl1 = stats.Woodcutting;
           wc2 = wc1;
           wc1 = playerList[i].playerUsername;
         }
         else if(stats.Woodcutting > wcLvl2){
+          wcLvl2 = stats.Woodcutting;
           wc2 = playerList[i].playerUsername;
         }
 
         if(stats.Fishing > fishLvl1){
+          fishLvl2 = fishLvl1;
+          fishLvl1 = stats.Fishing;
           fish2 = wc1;
           fish1 = playerList[i].playerUsername;
         }
         else if(stats.Fishing > fishLvl2){
+          fishLvl2 = stats.Fishing;
           fish2 = playerList[i].playerUsername;
         }
 

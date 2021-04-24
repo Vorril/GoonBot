@@ -81,8 +81,8 @@ class Player{
     getLvls(){
         let stats = {};
 
-        stats.Fishing = Fishing.getLvls(this);
-        stats.Woodcutting = Woodcutting.getLvls(this);
+        stats.Fishing = Fishing.getLvl(this);
+        stats.Woodcutting = Woodcutting.getLvl(this);
 
         return stats;
     }
