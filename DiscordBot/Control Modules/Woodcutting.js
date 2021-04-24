@@ -75,7 +75,7 @@ fs.readFile("./Save Files/playerWoodcuttingData.json", function (errLoad, data) 
 const start = (message, mainPlayer) => {
 
     let wcPlayer = getPlayerWCData(mainPlayer.playerID);
-    let timeChop = 1000*60*60 * wcPlayer.wcLvl;//1hr per lvl
+    let timeChop = 1000*60*60 * Math.min(wcPlayer.wcLvl, 24);//1hr per lvl
     wcPlayer.startTime = Date.now();
 
     wcPlayer.activityTimeout = setTimeout(function(){chopWood(message, mainPlayer, wcPlayer)}, timeChop);//
@@ -212,4 +212,10 @@ const getStats = (mainPlayer) => {
     return `Woodcutting lvl: ${wcPlayer.wcLvl} XP: ${wcPlayer.wcXP} \n`;
 }
 
-module.exports = {start, stop, getInventory, getStats};
+const getLvl = (mainPlayer) => {
+
+    let wcPlayer = getPlayerWCData(mainPlayer.playerID);
+    return wcPlayer.wcLvl;
+}
+
+module.exports = {start, stop, getInventory, getStats, getLvl};

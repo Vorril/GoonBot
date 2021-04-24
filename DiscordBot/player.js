@@ -40,6 +40,15 @@ class Player{
 
         else message.channel.send(`${this.playerUsername} is busy ${this.currentAction}`);//busy doing what could probably extract this to a function it will happen often
     
+    }//chop
+
+    stopAll(message){
+        if(this.currentAction == "Woodcutting"){
+            Woodcutting.stop(message, this);
+        }
+        else if(this.currentAction == 'Fishing'){
+            Fishing.stop(message,this);
+        }
     }
 
     hydrate(message){
@@ -55,6 +64,7 @@ class Player{
         //inventoryString += Fishing.getInventory(this);
 
         inventoryString += Woodcutting.getInventory(this);
+        inventoryString += Fishing.getInventory(this);
 
         message.channel.send(`Your inventory: \n ${inventoryString}`);
     }
@@ -66,6 +76,15 @@ class Player{
         statStr += Woodcutting.getStats(this);
 
         message.channel.send(`${this.playerUsername}'s stats: \n ${statStr}`);
+    }
+
+    getLvls(){
+        let stats = {};
+
+        stats.Fishing = Fishing.getLvls(this);
+        stats.Woodcutting = Woodcutting.getLvls(this);
+
+        return stats;
     }
 
     save(){

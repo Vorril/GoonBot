@@ -12,6 +12,7 @@ class FishingDataChunk{
     fishingLvl = 1; 
     fishingXP = 0; 
     fishCaught = 0;
+    fishInventory = {};
     activityTimeout = "";
 
 
@@ -90,7 +91,15 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
        return;
    }//start fishing
 
+   const stop = (message, mainPlayer) => {
+    let fishingPlayer = getPlayerFishingData(mainPlayer.playerID);
 
+    if(fishingPlayer.activityTimeout != ""){
+        clearTimeout(fishingPlayer.activityTimeout);
+    }
+
+    saveFishingData();//should only run once done stopping 
+}
 
 //Periodically attempts to catch a fish
  const catchFish = (message, mainPlayer, fishingPlayer) => {
@@ -112,6 +121,14 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
             message.channel.send(`${mainPlayer.playerUsername} has leveled up! Fishing level ${fishingPlayer.fishingLvl}! :fireworks: :shark:`);
         }
  
+        //Inventory:
+        if(fishingPlayer.fishInventory.hasOwnProperty(caughtFish.type)){
+            fishingPlayer.fishInventory[caughtFish.type] += 1;
+        }
+        else{
+            fishingPlayer.fishInventory[caughtFish.type] = 1;
+        }
+
              saveFishingData();//Only an attempt may not if others are simultaneously fishing
          
      }//fish loop
@@ -142,6 +159,16 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
         fish.xp = 60;
         return fish;
     }
+    else if(catchPower < 400){
+        fish.type = "sworfish";
+        fish.xp = 75;
+        return fish;
+    }
+    else if(catchPower < 480){
+        fish.type = "lobster";
+        fish.xp = 90;
+        return fish;
+    }
 
 };//catchfish()
 
@@ -149,5 +176,20 @@ function getStats(mainPlayer){
     let fishingPlayer = getPlayerFishingData(mainPlayer.playerID);
     return `Fishing lvl: ${fishingPlayer.fishingLvl} XP: ${fishingPlayer.fishingXP} \n`;
 }
+function getLvl(mainPlayer){
+    let fishingPlayer = getPlayerFishingData(mainPlayer.playerID);
+    return fishingPlayer.fishingLvl;
+}
 
-module.exports = {start, getStats};// add getStats 
+const getInventory = (mainPlayer) =>{
+    let fishingPlayer = getPlayerFishingData(mainPlayer.playerID);
+    let invString = "";
+
+    Object.keys(fishingPlayer.fishInventory).forEach(element => {
+        invString += `${element} : ${fishingPlayer.fishInventory[element]} \n`;
+    });
+
+    return invString;
+}
+
+module.exports = {start, stop, getInventory, getStats, getLvl};// add getStats 

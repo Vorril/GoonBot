@@ -70,7 +70,17 @@ const checkForPlayer = (checkUser) => {//checking via the discord user obj incas
 const handleRPGCommands = (commandRead, commandModifier, message) => {
   let player;
   switch (commandRead) {
-    
+    case "!forcesave":
+      player = checkForPlayer(message.author);
+      if(player.username== 'Vorril#2467'){
+        console.log('Vorril forcesave');
+        for (i = 0; i < playerList.length; i++) {
+          playerList[i].stopAll();
+          
+        }
+        savePlayers();// Probably technically a race condition vs new inputs...
+      }
+    break;
 
     case "!fish":
       player = checkForPlayer(message.author);
@@ -101,6 +111,39 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
     case "!stats":
       player = checkForPlayer(message.author);
       player.printStats(message);
+    break;
+
+    case "!hiscores":
+    case "!hiscore":
+      let fish1 = ""; let fishLvl1 = -1;
+      let fish2 = ""; let fishLvl2 = -1;
+      let wc1 = ""; let wcLvl1 = -1;
+      let wc2 = ""; let wcLvl2 = -1;
+
+      for (i = 0; i < playerList.length; i++) {
+        let stats = playerList[i].getLvls();
+        
+        if(stats.Woodcutting > wcLvl1){
+          wc2 = wc1;
+          wc1 = playerList[i].playerUsername;
+        }
+        else if(stats.Woodcutting > wcLvl2){
+          wc2 = playerList[i].playerUsername;
+        }
+
+        if(stats.Fishing > fishLvl1){
+          fish2 = wc1;
+          fish1 = playerList[i].playerUsername;
+        }
+        else if(stats.Fishing > fishLvl2){
+          fish2 = playerList[i].playerUsername;
+        }
+
+      }//for each player
+
+      let scores = `Fishing 1st: ${fish1} Lvl: ${fishLvl1} :shark: \n Fishing 2nd: ${fish2} Lvl: ${fishLvl2}\n Woodcutting 1st ${wc1} Lvl: ${wcLvl1} :evergreen_tree: \n Woodcutting 2nd: ${wc2} Lvl: ${wcLvl2} \n`;
+
+      message.channel.send(scores);
     break;
     
     default:
