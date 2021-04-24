@@ -120,32 +120,35 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
       let wc1 = ""; let wcLvl1 = -1;
       let wc2 = ""; let wcLvl2 = -1;
 
-      for (i = 0; i < playerList.length; i++) {
-        let stats = playerList[i].getLvls();
+      //let numPlayers = playerList.length;
+      //for (i = 0; i < numPlayers; i++) {
+      playerList.forEach((playerEle)=>{
+
+        let stats = playerEle.getLvls();
         
         if(stats.Woodcutting > wcLvl1){
           wcLvl2 = wcLvl1;
           wcLvl1 = stats.Woodcutting;
           wc2 = wc1;
-          wc1 = playerList[i].playerUsername;
+          wc1 = playerEle.playerUsername;
         }
         else if(stats.Woodcutting > wcLvl2){
           wcLvl2 = stats.Woodcutting;
-          wc2 = playerList[i].playerUsername;
+          wc2 = playerEle.playerUsername;
         }
 
         if(stats.Fishing > fishLvl1){
           fishLvl2 = fishLvl1;
           fishLvl1 = stats.Fishing;
-          fish2 = wc1;
-          fish1 = playerList[i].playerUsername;
+          fish2 = fish1;
+          fish1 = playerEle.playerUsername;
         }
         else if(stats.Fishing > fishLvl2){
           fishLvl2 = stats.Fishing;
-          fish2 = playerList[i].playerUsername;
+          fish2 = playerEle.playerUsername;
         }
 
-      }//for each player
+      });//for each player
 
       let scores = `Fishing 1st: ${fish1} Lvl: ${fishLvl1} :shark: \n Fishing 2nd: ${fish2} Lvl: ${fishLvl2}\n Woodcutting 1st ${wc1} Lvl: ${wcLvl1} :evergreen_tree: \n Woodcutting 2nd: ${wc2} Lvl: ${wcLvl2} \n`;
 
