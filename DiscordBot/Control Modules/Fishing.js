@@ -47,7 +47,7 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
 
     if(busy) return;
 
-    fs.writeFile("./Save Files/playerFishingData.json", JSON.stringify(playerFishingData),
+    fs.writeFileSync("./Save Files/playerFishingData.json", JSON.stringify(playerFishingData),
      function (err) {}) 
    
      return;
@@ -139,34 +139,40 @@ fs.readFile("./Save Files/playerFishingData.json", function (errLoad, data) {
     let fish = {};
     let catchPower = level*100 * Math.random();//From 1 to 100*level
 
-    if(catchPower < 80){
-        fish.type = "shrimp";
-        fish.xp = 15;
+
+    if(catchPower > 560){
+        fish.type = "eel";
+        fish.xp = 100;
         return fish;
     }
-    else if(catchPower < 160){
-        fish.type = "bass";
-        fish.xp = 30;
+    else if(catchPower > 480){
+        fish.type = "lobster";
+        fish.xp = 90;
         return fish;
     }
-    else if(catchPower < 240){
-        fish.type = "cod";
-        fish.xp = 45;
-        return fish;
-    }
-    else if(catchPower < 320){
-        fish.type = "tuna";
-        fish.xp = 60;
-        return fish;
-    }
-    else if(catchPower < 400){
+    else if(catchPower > 400){
         fish.type = "sworfish";
         fish.xp = 75;
         return fish;
     }
-    else if(catchPower < 480){
-        fish.type = "lobster";
-        fish.xp = 90;
+    else if(catchPower > 320){
+        fish.type = "tuna";
+        fish.xp = 60;
+        return fish;
+    }
+    else if(catchPower > 240){
+        fish.type = "cod";
+        fish.xp = 45;
+        return fish;
+    }
+    else if(catchPower > 160){
+        fish.type = "bass";
+        fish.xp = 30;
+        return fish;
+    }
+    else{
+        fish.type = "shrimp";
+        fish.xp = 15;
         return fish;
     }
 
