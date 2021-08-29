@@ -3,6 +3,7 @@ const Woodcutting = require("./Control Modules/Woodcutting.js");
 const {savePlayers} = require("./Control Modules/RPGHandler.js");//feels like circular dependancy
 const {reminder} = require("./Control Modules/miscCommandsHandler.js");
 
+
 class Player{
     
     constructor(data){//data = JSON.parse() object
@@ -13,6 +14,7 @@ class Player{
     playerID = -1;
 
     hydration = 0;
+    goonpoints = 0;
 
     currentAction = "None";//Might become innacurate if something is in progress and bot crashes
 
@@ -72,10 +74,18 @@ class Player{
     printStats(message){
         let statStr = "";
 
+        statStr += `GoonPoints (GP): ${this.goonpoints} \n`;
         statStr += Fishing.getStats(this);
         statStr += Woodcutting.getStats(this);
 
         message.channel.send(`${this.playerUsername}'s stats: \n ${statStr}`);
+    }
+    printPoints(message){
+        let statStr = "";
+
+        statStr += `GoonPoints (GP): ${this.goonpoints} \n`;
+
+        message.channel.send(`${this.playerUsername}'s  ${statStr}`);
     }
 
     getLvls(){

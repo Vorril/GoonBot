@@ -81,7 +81,8 @@ const start = (message, mainPlayer) => {
     wcPlayer.activityTimeout = setTimeout(function(){chopWood(message, mainPlayer, wcPlayer)}, timeChop);//
     mainPlayer.currentAction = "Woodcutting";
 
-    message.channel.send(`${mainPlayer.playerUsername} started chopping wood... !chop to stop or get tired in ${wcPlayer.wcLvl} hrs`);
+    let maxtime = min(24, wcPlayer.wcLvl);
+    message.channel.send(`${mainPlayer.playerUsername} started chopping wood... !chop to stop or get tired in ${maxtime} hrs`);
 
     return;
 }//start WC

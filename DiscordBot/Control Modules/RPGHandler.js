@@ -5,6 +5,7 @@
  */
 const Player = require("../player");
 const fs = require("fs");
+const Bets = require("./Control Modules/betHandler.js")
 
 // Player Variables
 const playerList = []; //Consider using on object not an array...
@@ -69,6 +70,7 @@ const checkForPlayer = (checkUser) => {//checking via the discord user obj incas
 
 const handleRPGCommands = (commandRead, commandModifier, message) => {
   let player;
+
   switch (commandRead) {
     case "!forcesave":
       player = checkForPlayer(message.author);
@@ -153,8 +155,43 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
       let scores = `Fishing 1st: ${fish1} Lvl: ${fishLvl1} :shark: \n Fishing 2nd: ${fish2} Lvl: ${fishLvl2}\n Woodcutting 1st ${wc1} Lvl: ${wcLvl1} :evergreen_tree: \n Woodcutting 2nd: ${wc2} Lvl: ${wcLvl2} \n`;
 
       message.channel.send(scores);
-    break;
-    
+     break;
+
+    case "!points":
+      player = checkForPlayer(message.author);
+      player.printPoints(message);
+      break;
+
+    case "!bet":
+      player = checkForPlayer(message.author);
+
+      let betStatus = "";
+      betStatus += Bets.bet(player, commandModifier);
+
+      message.channel.send(betStatus);
+      break;
+
+    case "!startbet":
+    case "!newbet":
+      player = checkForPlayer(message.author);
+
+      let betStatus = "";
+      betStatus += Bets.startBet(message, player, commandModifier);
+
+      message.channel.send(betStatus);
+      break;
+
+    case "!endbet":
+      player = checkForPlayer(message.author);
+
+      let betStatus = "";
+      betStatus += Bets.endBet(message, player, commandModifier);
+
+      message.channel.send(betStatus);
+
+      savePlayers();
+      break;
+
     default:
       return "unfound";
       break;

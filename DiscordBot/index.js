@@ -107,13 +107,13 @@ client.on("voiceStateUpdate", (oldUserState, newUserState) => {
   if (
     oldUserState.channelID != newUserState.channelID &&
     newUserState.channelID == currentChannel.id
-  ) {
+    ) {
 
-    if (isReady)//Play personalized entry clip
-      setTimeout(() => {
-       handleEntryAudio(currentChannel, newUserState.id, playAudio);
-      }, 350);
-  }
+      if (isReady)//Play personalized entry clip
+        setTimeout(() => {
+        handleEntryAudio(currentChannel, newUserState.id, playAudio);
+        }, 350);
+    }
 });
 
 client.on("message", (message) => {
@@ -137,7 +137,7 @@ client.on("message", (message) => {
       }
 
       return;// Potential to cause problems if not done... should actually check DM, vs voice, vs text
-    }
+    }//if DMd
 
   //Typical syntax: !commandRead commandModifier
   //Check if modifier was given and split the two:
@@ -210,7 +210,7 @@ client.on("message", (message) => {
 
     let allAreInvalid = true;
     resArr.forEach((res) => {
-      if (typeof res === "undefined") {
+      if (typeof res === "undefined") {//Functions return nothing if they do something, a string if they do not
         allAreInvalid = false;
       }
     });
