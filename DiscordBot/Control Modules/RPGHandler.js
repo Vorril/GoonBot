@@ -5,7 +5,7 @@
  */
 const Player = require("../player");
 const fs = require("fs");
-const Bets = require("./Control Modules/betHandler.js")
+const Bets = require("./betHandler.js")
 
 // Player Variables
 const playerList = []; //Consider using on object not an array...
@@ -165,7 +165,7 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
     case "!bet":
       player = checkForPlayer(message.author);
 
-      let betStatus = "";
+      betStatus = "";
       betStatus += Bets.bet(player, commandModifier);
 
       message.channel.send(betStatus);
@@ -175,7 +175,7 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
     case "!newbet":
       player = checkForPlayer(message.author);
 
-      let betStatus = "";
+      betStatus = "";
       betStatus += Bets.startBet(message, player, commandModifier);
 
       message.channel.send(betStatus);
@@ -184,7 +184,7 @@ const handleRPGCommands = (commandRead, commandModifier, message) => {
     case "!endbet":
       player = checkForPlayer(message.author);
 
-      let betStatus = "";
+      betStatus = "";
       betStatus += Bets.endBet(message, player, commandModifier);
 
       message.channel.send(betStatus);

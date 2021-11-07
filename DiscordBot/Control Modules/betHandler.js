@@ -23,7 +23,7 @@ function hasPermission(member) {
     let authorRoles = member.roles;    
     let hasAdmin = false;
 
-    authorRoles.forEach(role => {
+    authorRoles.forEach((role) => {
         if(role.permissions & 0x8){ // 0x8 has admin 0x0010000000 // can Manage roles
             hasAdmin = true;
         }
