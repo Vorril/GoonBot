@@ -204,17 +204,17 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
       break;
 
       case "!lailai":
-        let rand3 = Math.random();
-        if(rand3 < 0.2){
+        let randlai = Math.random();
+        if(randlai < 0.2){
           playAudio(message.member.voice.channel, "./Audio/lailai1.mp3");
         }
-        else if(rand3 < 0.4){
+        else if(randlai < 0.4){
           playAudio(message.member.voice.channel, "./Audio/lailai2.mp3");
         }
-        else if(rand3 < 0.6){
+        else if(randlai < 0.6){
           playAudio(message.member.voice.channel, "./Audio/lailai3.mp3");
         }
-        else if(rand3 < 0.8){
+        else if(randlai < 0.8){
           playAudio(message.member.voice.channel, "./Audio/lailai4.mp3");
         }
         else{
