@@ -10,7 +10,6 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
     case "!cleanup":
       //clear useulss / old chat messages
 
-      let msglist;
       let numdel = 20;
       let testint = 0;
 
@@ -18,11 +17,11 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
       if(!isNaN(testint) && testint > 0) numdel = testint;
 
       message.channel.messages.fetch({ limit: numdel, cache: false })
-        .then(fetched => msglist = fetched);
+        .then(fetched => {
+          
+          fetched.sweep(msg => msg.author.tag != "GoonBot#3603" && !msg.content.startsWith("!"));
 
-      msglist.sweep(msg => msg.author.tag != "GoonBot#3603" && !msg.content.startsWith("!"));
-
-      message.channel.bulkDelete(msglist);
+          message.channel.bulkDelete(fetched);
         
       break;
 
