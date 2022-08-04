@@ -5,7 +5,8 @@ const handleHelperCommands = (commandRead, message) => {
         `GoonBot know do these: \n !gif <search> \n !stock <ticker> \n !hydrate \n !roll <#> <...> \n !rps <#players> \n !remind(er) <When> <Note> \n !hydrated
          \n !audio !audiocommands
          \n RPG commands: !fish !chop !inv !inventory !stats !hiscore
-         \n !startbet <bet> !bet <for/against> <amount> !endbet <outcome>`
+         \n !startbet <bet> !bet <for/against> <amount> !endbet <outcome>
+         \n !clean !clear <#>`
         
         ); //!startQuest \n !stats");
       break;

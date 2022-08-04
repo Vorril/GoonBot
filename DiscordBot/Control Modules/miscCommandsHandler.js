@@ -1,8 +1,45 @@
+
+const fs = require("fs");
+
 const handleMiscCommands = (commandRead, commandModifier, message, process) => {
+
   switch (commandRead) {
+
+    case "!clean":
+    case "!clear":
     case "!cleanup":
       //clear useulss / old chat messages
+
+      let msglist;
+      let numdel = 20;
+      let testint = 0;
+
+      if(commandModifier != "") testint = parseInt(commandModifier);
+      if(!isNaN(testint) && testint > 0) numdel = testint;
+
+      message.channel.messages.fetch({ limit: numdel, cache: false })
+        .then(fetched => msglist = fetched);
+
+      msglist.sweep(msg => msg.author.tag != "GoonBot#3603" && !msg.content.startsWith("!"));
+
+      message.channel.bulkDelete(msglist);
+        
       break;
+
+    case "!ticket":
+    case "!log":
+
+    let logmsg = message.author.tag + '\n';
+    logmsg += Date.now() + '\n';
+    logmsg += commandModifier;
+
+    fs.appendFile('log.txt', logmsg, function (err) {
+          if (err) throw err;
+          console.log('Saved log!');
+        });
+
+
+    break
 
     case "!remind":
     case "!reminder":
@@ -31,6 +68,8 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
       break;
   }
 };//handleMisc end
+
+
 
 
 function isTimeUnit(parseString){
