@@ -22,7 +22,7 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
           fetched.sweep(msg => msg.author.tag != "GoonBot#3603" && !msg.content.startsWith("!"));
 
           message.channel.bulkDelete(fetched);
-        
+        }
       break;
 
     case "!ticket":
@@ -38,7 +38,7 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
         });
 
 
-    break
+    break;
 
     case "!remind":
     case "!reminder":
