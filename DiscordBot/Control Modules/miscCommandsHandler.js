@@ -17,13 +17,7 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
       if(!isNaN(testint) && testint > 0) numdel = testint;
 
       try{
-      async function asyncFetch(){
-          const msgList = await message.channel.messages.fetch({ limit: numdel, cache: false });
-        
-          msgList.sweep(msg => msg.author.tag != "GoonBot#3603" && !msg.content.startsWith("!"));
-
-          message.channel.bulkDelete(msgList);
-        }
+        asyncFetch()
         }//try
         catch (error){
             console.log("Sweep messages error");
@@ -35,7 +29,7 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
 
     let logmsg = message.author.tag + '\n';
     logmsg += Date.now() + '\n';
-    logmsg += commandModifier;
+    logmsg += commandModifier + '\n';
 
     fs.appendFile('log.txt', logmsg, function (err) {
           if (err) throw err;
@@ -73,7 +67,13 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
   }
 };//handleMisc end
 
+async function asyncFetch(){
+          msgList = await message.channel.messages.fetch({ limit: numdel, cache: false });
+        
+          msgList.sweep(msg => msg.author.tag != "GoonBot#3603" && !msg.content.startsWith("!"));
 
+          message.channel.bulkDelete(msgList);
+        }
 
 
 function isTimeUnit(parseString){
