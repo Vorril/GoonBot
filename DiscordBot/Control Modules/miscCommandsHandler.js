@@ -17,7 +17,7 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
       if(!isNaN(testint) && testint > 0) numdel = testint;
 
       try{
-        asyncFetch()
+        asyncFetch(message, numdel)
         }//try
         catch (error){
             console.log("Sweep messages error");
@@ -67,7 +67,7 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
   }
 };//handleMisc end
 
-async function asyncFetch(){
+async function asyncFetch(message, numdel){
           msgList = await message.channel.messages.fetch({ limit: numdel, cache: false });
         
           msgList.sweep(msg => msg.author.tag != "GoonBot#3603" && !msg.content.startsWith("!"));
