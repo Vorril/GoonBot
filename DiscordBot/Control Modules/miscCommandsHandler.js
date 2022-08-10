@@ -24,7 +24,7 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
           message.channel.bulkDelete(msgList);
         
         }//try
-        catch{
+        catch (error){
             console.log("Sweep messages error");
         }
       break;//case clear
