@@ -16,14 +16,18 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
       if(commandModifier != "") testint = parseInt(commandModifier);
       if(!isNaN(testint) && testint > 0) numdel = testint;
 
-      message.channel.messages.fetch({ limit: numdel, cache: false })
-        .then(fetched => {
-          
-          fetched.sweep(msg => msg.author.tag != "GoonBot#3603" && !msg.content.startsWith("!"));
+      try{
+          msgList = await message.channel.messages.fetch({ limit: numdel, cache: false });
+        
+          msgList.sweep(msg => msg.author.tag != "GoonBot#3603" && !msg.content.startsWith("!"));
 
-          message.channel.bulkDelete(fetched);
+          message.channel.bulkDelete(msgList);
+        
+        }//try
+        catch{
+            console.log("Sweep messages error");
         }
-      break;
+      break;//case clear
 
     case "!ticket":
     case "!log":

@@ -6,7 +6,8 @@ const handleHelperCommands = (commandRead, message) => {
          \n !audio !audiocommands
          \n RPG commands: !fish !chop !inv !inventory !stats !hiscore
          \n !startbet <bet> !bet <for/against> <amount> !endbet <outcome>
-         \n !clean !clear <#>`
+         \n !clean !clear <#>
+         \n !ticket <yourcrappyopinion>`
         
         ); //!startQuest \n !stats");
       break;
