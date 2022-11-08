@@ -1,10 +1,12 @@
 
 const fs = require("fs");
+const Multimap = require('multimap');
 
 let entryList = [];//[{"user":"userID","clip":"!clip"},{...},{...}...]
-let audioMap = [];//[{command:'"!command","fpath":"./Audio/file.mp3"},{...}...]
-let submittedAudioMap = [];//User submitted mp3s, less curated, keeping segregated
+let audioMap = new Multimap();//[{command:'"!command","fpath":"./Audio/file.mp3"},{...}...]
+let submittedAudioMap = [];//User submitted mp3s, less curated, keeping segregated // not implemented
 
+//readFile audio unique user entry settings:
 fs.readFile("./Audio/UserEntry.json", function (errLoad, data) {
   if (errLoad) {
     console.log("Failed to load entry audio settings json");
@@ -20,10 +22,14 @@ fs.readFile("./Audio/audiomap.json", function(errLoad2, data2){
     console.log("Failed to load audio file mapping json");
   } 
   else {
-     audioMap = JSON.parse(data2);
-      //console.log(audioMap); //still contains \n chars but doesnt sem to be an issue for .parse(), Online sources made it seem like it would be
+    var audioMapJSON = JSON.parse(data2);
+      
+    for(var audiocommand in audioMapJSON){
+        audioMap.set(audiocommand, audioMapJSON[audiocommand]); // MultiMap
     }
-  console.log(`Loaded ${audioMap.length} entry audio settings`);
+
+    }
+  console.log(`Loaded ${audioMap.size} entry audio settings`);
 });//readFile audio command filename map
 
 fs.readFile("./Audio/Submitted/submittedAudio.json", function(errLoad2, data2){
@@ -105,127 +111,47 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
 
 
   //Search the audiomap loaded from file:
-  let audioIndex = audioMap.findIndex(function(object){
-    return object.command == commandRead;
-  });
-  //Check submitted index:
-  if(audioIndex < 0) audioIndex = submittedAudioMap.findIndex(function(object){
-    return object.command == commandRead;
-  });
+  if(audioMap.has(commandRead)){
 
+    let foundVals = audioMap.get(commandRead);
 
-  if(audioIndex > -1){
-    playAudio(message.member.voice.channel, audioMap[audioIndex].fpath);
+    if(foundVals.length == 1) playAudio(message.member.voice.channel, foundVals[0]);
+
+    else{//More than one value for the key
+        let randIndex = Math.floor(Math.random() * foundVals.length);
+        playAudio(message.member.voice.channel, foundVals[randIndex]);
+    }
 
     setTimeout(() => {
-      message.delete();
-    }, deleteDelay);
-
-    return;//audio was found and played
-  }
-
-
-  switch (commandRead) {    
-    //Unique clip calls or misc audioHandler commands
-   
-      case "!chickenwing":
-        if(Math.random()>0.333){
-          playAudio(message.member.voice.channel, "./Audio/chickenwing.mp3");}
-        else{
-          playAudio(message.member.voice.channel, "./Audio/chickenwing2.mp3");}
-          
-      setTimeout(() => {
         message.delete();
       }, deleteDelay);
-      break;
- 
-      case "!stranger":
-        let rand = Math.random();
-        if(rand < 0.3333){
-          playAudio(message.member.voice.channel, "./Audio/st1.mp3");
-        }
-        else if(rand > 0.6667){
-          playAudio(message.member.voice.channel, "./Audio/st2.mp3");
-        }
-        else{
-          playAudio(message.member.voice.channel, "./Audio/st3.mp3");
-        }
 
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-      break;
+    return;
+  }
 
-      case "!bwonsamdi":
-        let rand3 = Math.random();
-        if(rand3 < 0.2){
-          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/badloa.wav");
-        }
-        else if(rand3 < 0.4){
-          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/died.wav");
-        }
-        else if(rand3 < 0.6){
-          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/mistaken.wav");
-        }
-        else if(rand3 < 0.8){
-          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/romance.wav");
-        }
-        else{
-          playAudio(message.member.voice.channel, "./Audio/Bwonsamdi/truelove.wav");
-        }
+  //Not a command for a clip, check for other audio related commands:
+  else switch (commandRead) {    
+    //Unique clip calls or misc audioHandler commands
+   
+    case "!reload":
+    case "!reloadaudio":
+        audioMap.clear();
+        
+        fs.readFile("./Audio/audiomap.json", function(errLoad2, data2){
+          if (errLoad2) {
+            console.log("Failed to load audio file mapping json");
+          } 
+          else {
+            var audioMapJSON = JSON.parse(data2);
+      
+            for(var audiocommand in audioMapJSON){
+                audioMap.set(audiocommand, audioMapJSON[audiocommand]); // MultiMap
+            }
 
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-      break;
-
-      case "!later":
-        let rand2 = Math.random();
-        if(rand2 < 0.2){
-          playAudio(message.member.voice.channel, "./Audio/eternitylater.wav");
-        }
-        else if(rand2 < 0.4){
-          playAudio(message.member.voice.channel, "./Audio/sixlater.wav");
-        }
-        else if(rand2 < 0.6){
-          playAudio(message.member.voice.channel, "./Audio/momentslater.wav");
-        }
-        else if(rand2 < 0.8){
-          playAudio(message.member.voice.channel, "./Audio/threelater.wav");
-        }
-        else{
-          playAudio(message.member.voice.channel, "./Audio/twentylater.wav");
-        }
-
-
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-      break;
-
-      case "!lailai":
-        let randlai = Math.random();
-        if(randlai < 0.2){
-          playAudio(message.member.voice.channel, "./Audio/lailai1.mp3");
-        }
-        else if(randlai < 0.4){
-          playAudio(message.member.voice.channel, "./Audio/lailai2.mp3");
-        }
-        else if(randlai < 0.6){
-          playAudio(message.member.voice.channel, "./Audio/lailai3.mp3");
-        }
-        else if(randlai < 0.8){
-          playAudio(message.member.voice.channel, "./Audio/lailai4.mp3");
-        }
-        else{
-          playAudio(message.member.voice.channel, "./Audio/lailai5.mp3");
-        }
-
-
-        setTimeout(() => {
-          message.delete();
-        }, deleteDelay);
-      break;
+            }
+          console.log(`Loaded ${audioMap.size} entry audio settings`);
+        });//readFile audio command filename map
+    break;
       
     case "!friday":
       let today = new Date();
@@ -248,7 +174,7 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
 
     case "!audio":
     case "!audiocommands"://Most are autogenerated, these have special behavior
-      let commandList = "Audio related commands:loud_sound:: \n !enter <clip> \n Clips: \n !chickenwing !stranger !friday";//Need to put anything in the switch statement in here
+      let commandList = "Audio related commands:loud_sound:: \n !enter <clip> \n Clips: \n !friday ;//Need to put anything in the switch statement in here
 
       audioMap.forEach(element => {
         commandList += (element.command + " ");
