@@ -1,6 +1,33 @@
 
 const fs = require("fs");
 
+let redditJokeList = []; // Jokes scraped form reddit with > 400 upvotes
+let redditJokeNum = 0;
+let qJokeList = []; // Jokes in the form a question
+let qJokeNum = 0;
+
+fs.readFile("./Jokes/reddittopjokes.json", function (errLoad, data) {
+  if (errLoad) {
+    console.log("Failed to load reddit jokes json");
+  } 
+  else {
+    redditJokeList = JSON.parse(data); 
+  }
+  console.log(`Loaded ${redditJokeList.length} reddit jokes`);
+  redditJokeNum = redditJokeList.length;
+}); //readFile reddit joke json
+
+fs.readFile("./Jokes/wockajokes_pp.json", function (errLoad, data) {
+  if (errLoad) {
+    console.log("Failed to load wocka jokes json");
+  } 
+  else {
+    qJokeList = JSON.parse(data); 
+  }
+  console.log(`Loaded ${qJokeList.length} wocka jokes`);
+  qJokeNum = qJokeList.length;
+}); //readFile question joke json
+
 const handleMiscCommands = (commandRead, commandModifier, message, process) => {
 
   switch (commandRead) {
@@ -44,6 +71,55 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
       reminder(message, commandModifier);
       break;
 
+
+    case: "!joke":
+        let jIndex = 0;
+        let jString = "";
+        let doTTS = false;
+
+        if(commandModifier == "tts" || commandModifier == "TTS"){
+        //If TTS, use only reddit joke list and get joke of length below max length
+            doTTS = true;
+            jString = "/tts "
+        }
+
+        if(!doTTS && Math.random() < 0.2){ // do a wocka joke with spoiler tag
+            jIndex = Math.floor(Math.random() * qJokeNum);
+            let joke = qJokeList[jIndex];
+
+            jString += joke["body"];
+            jString += "\n ||"
+            jString += joke["answer"]
+            jString += "||"
+        }//do a wocka joke
+
+        else{ //Do a reddit joke
+            jIndex = Math.floor(Math.random() * redditJokeNum);
+            let joke = redditJokeList[jIndex];
+
+            let ttsLength = false; //the found joke is short enough for TTS
+            while(!ttsLength && doTTS){
+                let totallength = joke["title"].length + joke["body"].length;
+
+                if(totallength < 200){//Max desired length in chars here
+                    ttsLength = true;
+                }
+                else{//reroll
+                    jIndex = Math.floor(Math.random() * redditJokeNum);
+                    joke = redditJokeList[jIndex];
+                }
+
+            }//while looking for suitable joke
+
+            jString += joke["title"];
+            jString += "\n"
+            jString += joke["body"]
+
+        }//do reddit joke
+
+        message.channel.send(jString);
+
+        break;//end !joke
     //Testing funcitons:
     case "!time":
       const currdate = Date.now();
