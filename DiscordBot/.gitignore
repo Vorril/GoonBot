@@ -11,5 +11,9 @@ playerData.json
 ./Audio/Submitted/
 ./Audio/
 /Audio
+/Jokes
+./Jokes/
+./Jokes/reddittopjokes.json
+./Jokes/wockajokes_pp.json
 log.txt
 .log.txt

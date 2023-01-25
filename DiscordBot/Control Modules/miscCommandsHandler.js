@@ -72,7 +72,7 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
       break;
 
 
-    case: "!joke":
+    case "!joke":
         let jIndex = 0;
         let jString = "";
         let doTTS = false;
@@ -80,10 +80,9 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
         if(commandModifier == "tts" || commandModifier == "TTS"){
         //If TTS, use only reddit joke list and get joke of length below max length
             doTTS = true;
-            jString = "/tts "
         }
 
-        if(!doTTS && Math.random() < 0.2){ // do a wocka joke with spoiler tag
+        if(!doTTS && Math.random() < 0.22){ // do a wocka joke with spoiler tag
             jIndex = Math.floor(Math.random() * qJokeNum);
             let joke = qJokeList[jIndex];
 
@@ -117,7 +116,8 @@ const handleMiscCommands = (commandRead, commandModifier, message, process) => {
 
         }//do reddit joke
 
-        message.channel.send(jString);
+        if(doTTS) message.channel.send(jString, {tts:true});
+        else message.channel.send(jString);
 
         break;//end !joke
     //Testing funcitons:
