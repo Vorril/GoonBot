@@ -1,0 +1,3 @@
+C:\Users\andre\source\repos\Vorril\GoonBot\obj\Debug\GoonBot.njsproj.AssemblyReference.cache
+C:\Users\andre\source\repos\Vorril\GoonBot\obj\Debug\GoonBot.njsproj.CoreCompileInputs.cache
+C:\Users\andre\source\repos\Vorril\GoonBot\bin\Microsoft.NodejsTools.WebRole.dll

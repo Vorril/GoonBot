@@ -125,11 +125,13 @@ const handleAudioCommands = (commandRead, commandModifier, message, playAudio) =
 
     let foundVals = audioMap.get(commandRead);
 
-    if(foundVals.length == 1) playAudio(message.member.voice.channel, foundVals[0]);
+    //if(foundVals.length == 1) playAudio(message.member.voice.channel, foundVals[0]);
+    if(foundVals.length == 1) playAudio(message, foundVals[0]);
 
     else{//More than one value for the key
         let randIndex = Math.floor(Math.random() * foundVals.length);
-        playAudio(message.member.voice.channel, foundVals[randIndex]);
+        //playAudio(message.member.voice.channel, foundVals[randIndex]);
+        playAudio(message, foundVals[randIndex]);
     }
 
     setTimeout(() => {

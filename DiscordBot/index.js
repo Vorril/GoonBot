@@ -1,12 +1,14 @@
 /**
  * Includes
  */
-const Discord = require("discord.js");
+const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const ffmpeg = require("ffmpeg");
 const { OpusEncoder } = require("@discordjs/opus");
 const encoder = new OpusEncoder(48000, 2);
 const { prefix, token } = require("./config.json");
-const client = new Discord.Client();
+const {generateDependancyReport, AudioPlayerStatus, joinVoiceChannel, createAudioPlayer, createAudioResource} = require("@discordjs/voice")
+//const { createDiscordJSAdapter } = require("adapter.ts")
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] });
 
 /**
  * Control Modules
@@ -34,44 +36,63 @@ const { handleAudioCommands, handleEntryAudio, submitAudio } = require("./Contro
 
 const { handleStockCommands } = require("./Control Modules/StockHandler.js");
 
+
+
+
 //Bot variables:
 var isReady = false;
 var currentChannel = "";
 var timeAllowed = -1;
+var activeGuildId = 0; //Better way to do this but Im getting errors //Get from messages
+var connection = 0;
+const audioPlayer = createAudioPlayer();
+
+audioPlayer.on('error', error => {
+    console.error('Throw audio player error ');
+});
+
+
+
+
 
 /*
  *  static functions
  */
-function playAudio(voiceChannel, audioFile) {//should refactor but it mentions a static var in this js
-  //console.log(voiceChannel.id);
-  isReady = false;
-  if (!voiceChannel) {
-    isReady = true;
-    return; // Messager is not in a voice channel
-  }
+function playAudio(message, audioFile) {//should refactor but it mentions a static var in this js
+    voiceChannel = message.member.voice.channel
 
-  if (voiceChannel.id == currentChannel.id) {
-    //Bot is alrleady in the correct channel
-    (connection) => {
-      const dispatcher = connection.play(audioFile);
+    isReady = false;
 
-      dispatcher.on("finish", () => {
+      if (!voiceChannel) {
         isReady = true;
-      });
-    };
-  }
+        return; // Messager is not in a voice channel//TODO better way exists
+      }
 
-  voiceChannel
-    .join()
-    .then((connection) => {
-      //Bot needs to join first
-      const dispatcher = connection.play(audioFile);
 
-      dispatcher.on("finish", () => {
-        isReady = true;
-      });
+    connection = joinVoiceChannel({
+        channelId: message.member.voice.channel.id,
+        guildId: message.guild.id,
+        adapterCreator: message.guild.voiceAdapterCreator
     })
-    .catch((err) => console.log(err));
+
+
+
+          
+    var resource = createAudioResource(audioFile);//Could predo these on load I guess
+
+    audioPlayer.play(resource);
+
+    const subscription = connection.subscribe(audioPlayer);
+    if (subscription) {
+        // Unsubscribe after 12 seconds (stop playing audio on the voice connection)
+        setTimeout(() => subscription.unsubscribe(), 12_000);
+    }
+
+    audioPlayer.on(AudioPlayerStatus.Idle, () => {
+        isReady = true;
+    });
+
+
 
   //Setup leaving and cleanup:
   currentChannel = voiceChannel;
@@ -79,7 +100,7 @@ function playAudio(voiceChannel, audioFile) {//should refactor but it mentions a
   //setTimeout(() => { message.delete(); }, 350);
 }
 
-function channelTimeout() {
+function channelTimeout() { //TODO probably not working since v14 update
   //Called on interval
   if (currentChannel != "" && currentChannel.members.size < 2 && Date.now() > timeAllowed ) {
     currentChannel.leave();
@@ -92,14 +113,16 @@ function channelTimeout() {
  */
 
 client.on("ready", function () {
-  console.log("Ready");
-  isReady = true;
+    console.log("Ready");
+    
+    isReady = true;
+
   setInterval(channelTimeout, 60000); //Check every 1m
 });
 
 //Called on channel change, mute, or deafen, but I think not on user name changes
 client.on("voiceStateUpdate", (oldUserState, newUserState) => {
-  if (newUserState.id == 742609957148557374) return; //ignore the bot itself //Should double check this value on startup not ure if it's immutable
+  //if (newUserState.id == 742609957148557374) return; //ignore the bot itself //Should double check this value on startup not ure if it's immutable
   //console.log(oldUserState.channelID);
   //console.log(newUserState);
 
@@ -111,12 +134,15 @@ client.on("voiceStateUpdate", (oldUserState, newUserState) => {
 
       if (isReady)//Play personalized entry clip
         setTimeout(() => {
-        handleEntryAudio(currentChannel, newUserState.id, playAudio);
+        //handleEntryAudio(currentChannel, newUserState.id, playAudio);
         }, 350);
     }
 });
 
-client.on("message", (message) => {
+client.on("messageCreate", (message) => {
+    //console.log("Message event");
+    //console.log(message);
+
   /**
    * Do nothing if command isn't valid or someone tricked bot into saying !something
    */
@@ -151,6 +177,9 @@ client.on("message", (message) => {
     commandLength == -1
       ? ""
       : message.content.substring(message.content.indexOf(" ") + 1); //Might fail in the special case commandRead is 1 char long?
+
+
+   // console.log("Echo command read: " + commandRead);
 
   /***************************************
    ********     HANDLE GIFS     **********

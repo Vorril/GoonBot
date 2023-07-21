@@ -1,0 +1,5 @@
+npm install discord.js
+npm install @discordjs/voice libsodium-wrappers
+npm install ffmpeg-static
+npm isntall yahoo-finance
+npm install multimap
