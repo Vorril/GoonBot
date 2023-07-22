@@ -58,7 +58,7 @@ audioPlayer.on('error', error => {
 /*
  *  static functions
  */
-function playAudio(message, audioFile) {//should refactor but it mentions a static var in this js
+function playAudio(message, audioFile) {//should refactor into audihandler.js and set to return currentChannel that should work
     voiceChannel = message.member.voice.channel
 
     isReady = false;
@@ -100,6 +100,40 @@ function playAudio(message, audioFile) {//should refactor but it mentions a stat
   //setTimeout(() => { message.delete(); }, 350);
 }
 
+
+
+function playAudioCurrent(audioFile) {// play to the current channel bot is in without parsing it from a passed message first
+    isReady = false;
+
+    console.log("Attempting to play entry clip..." + audioFile);
+    console.log(currentChannel);
+
+    connection = joinVoiceChannel({//not checking if already exists, I think this is corrct way to do it
+        channelId: currentChannel.id,
+        guildId: currentChannel.guildId,
+        adapterCreator: currentChannel.guild.voiceAdapterCreator
+    })
+
+
+    var resource = createAudioResource(audioFile);//Could predo these on load I guess
+
+
+    audioPlayer.play(resource);
+
+    const subscription = connection.subscribe(audioPlayer);
+
+    if (subscription) {
+        // Unsubscribe after 12 seconds (stop playing audio on the voice connection)
+        setTimeout(() => subscription.unsubscribe(), 12_000);
+    }
+
+    audioPlayer.on(AudioPlayerStatus.Idle, () => {
+        isReady = true;
+    });
+}
+
+
+
 function channelTimeout() { //TODO probably not working since v14 update
   //Called on interval
   if (currentChannel != "" && currentChannel.members.size < 2 && Date.now() > timeAllowed ) {
@@ -122,19 +156,22 @@ client.on("ready", function () {
 
 //Called on channel change, mute, or deafen, but I think not on user name changes
 client.on("voiceStateUpdate", (oldUserState, newUserState) => {
-  //if (newUserState.id == 742609957148557374) return; //ignore the bot itself //Should double check this value on startup not ure if it's immutable
-  //console.log(oldUserState.channelID);
-  //console.log(newUserState);
+  if (newUserState.id == 742609957148557374) return; //ignore the bot itself //Should double check this value on startup not ure if it's immutable
+    //console.log(oldUserState.channelId);
+    //console.log(newUserState.channelId);
+    //console.log(currentChannel.id);
+    //console.log(currentChannel);
 
   //The user event was a channel change and the new channel is the same the bot is currently in
   if (
-    oldUserState.channelID != newUserState.channelID &&
-    newUserState.channelID == currentChannel.id
+    oldUserState.channelId != newUserState.channelId &&
+      newUserState.channelId == currentChannel.id
     ) {
 
       if (isReady)//Play personalized entry clip
+          console.log("Attempting to play entry audio..." + newUserState.id);
         setTimeout(() => {
-        //handleEntryAudio(currentChannel, newUserState.id, playAudio);
+            handleEntryAudio(currentChannel, newUserState.id, playAudioCurrent);
         }, 350);
     }
 });
@@ -152,7 +189,7 @@ client.on("messageCreate", (message) => {
   )
     return;
 
-    if(typeof(message.channel) == "DMChannel"){//message was DMd to goobot
+    if(typeof(message.channel) == "DMChannel"){//message was DMd to goobot //I think there is a new event type for this
       //handleDM() should probably refactor this...
       if(message.attachments.first()){//Messageattachments is a map of messageattachment obects check api
         if(message.attachments.first().name.endsWith(".mp3")){
