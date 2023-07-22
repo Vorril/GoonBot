@@ -68,15 +68,15 @@ function playAudio(message, audioFile) {//should refactor into audihandler.js an
         return; // Messager is not in a voice channel//TODO better way exists
       }
 
-
+    
     connection = joinVoiceChannel({
         channelId: message.member.voice.channel.id,
         guildId: message.guild.id,
         adapterCreator: message.guild.voiceAdapterCreator
     })
+    
 
-
-
+    //console.log(audioPlayer);
           
     var resource = createAudioResource(audioFile);//Could predo these on load I guess
 
@@ -106,17 +106,20 @@ function playAudioCurrent(audioFile) {// play to the current channel bot is in w
     isReady = false;
 
     console.log("Attempting to play entry clip..." + audioFile);
-    console.log(currentChannel);
+    //console.log(currentChannel);
 
+    
     connection = joinVoiceChannel({//not checking if already exists, I think this is corrct way to do it
         channelId: currentChannel.id,
         guildId: currentChannel.guildId,
         adapterCreator: currentChannel.guild.voiceAdapterCreator
     })
-
+    
 
     var resource = createAudioResource(audioFile);//Could predo these on load I guess
 
+    //console.log(connection);
+    //console.log(audioPlayer);
 
     audioPlayer.play(resource);
 

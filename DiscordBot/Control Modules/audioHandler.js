@@ -100,7 +100,12 @@ const handleEntryAudio = (currentChannel, userID, playAudioCurrent) =>  {
   let clipToUse;
   userIndex == -1 ? clipToUse = "!beta" : clipToUse = entryList[userIndex].clip;
 
-  playAudioCurrent(clipToUse);
+    //Convert from command to path
+    let foundVals = audioMap.get(clipToUse);
+    clipToUse = foundVals[0];
+
+
+  playAudioCurrent( clipToUse);
 };
 
 //Checking through ! commands
